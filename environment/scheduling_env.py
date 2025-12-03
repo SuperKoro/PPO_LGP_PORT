@@ -18,7 +18,7 @@ from environment.env_utils import (
     machine_pool
 )
 from training.portfolio_types import Gene, ActionIndividual
-from training.typed_action_adapter import run_action_individual
+# NOTE: run_action_individual is imported inside step() to avoid circular import
 
 
 # Initial jobs data
@@ -282,6 +282,9 @@ class DynamicSchedulingEnv(gym.Env):
         Returns:
             next_state, reward, done, info
         """
+        # Lazy import to avoid circular dependency
+        from training.typed_action_adapter import run_action_individual
+        
         # Check if all dynamic jobs processed
         if self.current_dynamic_index >= len(self.dynamic_jobs_events):
             return self._get_state(), 0.0, True, {}

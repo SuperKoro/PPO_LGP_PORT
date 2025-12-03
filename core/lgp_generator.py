@@ -3,7 +3,7 @@ from typing import List
 import random
 
 from config import LGPConfig
-from lgp_instructions import (
+from core.lgp_instructions import (
     Instruction,
     LoadInputInstruction,
     LoadConstInstruction,
@@ -14,7 +14,7 @@ from lgp_instructions import (
     ConditionalSkipInstruction,
     SetPortfolioInstruction,
 )
-from lgp_program import LGPProgram
+from core.lgp_program import LGPProgram
 
 
 # Các key input macro, bạn có thể mở rộng thêm

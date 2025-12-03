@@ -2,9 +2,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 
-from ga_portfolio import ActionIndividual, Gene
+from training.portfolio_types import ActionIndividual, Gene
 from config import LGPConfig
-from lgp_instructions import (
+from core.lgp_instructions import (
     Instruction,
     SetPortfolioInstruction,
     instruction_from_dict,

@@ -1,6 +1,6 @@
 # metaheuristics_impl.py
 from typing import Any, Dict, List
-from mh_registry import register_mh
+from registries.mh_registry import register_mh
 
 
 @register_mh("SA")
@@ -12,7 +12,7 @@ def mh_sa(env,
     Metaheuristic SA: gọi reschedule_unfinished_jobs_sa trong main.py.
     Bạn có thể tinh chỉnh mapping time_budget_s -> iterations.
     """
-    from main import reschedule_unfinished_jobs_sa
+    from environment.env_utils import reschedule_unfinished_jobs_sa
     current_time = env.current_time
     machine_pool = env.machine_pool
 
@@ -31,7 +31,7 @@ def mh_ga(env,
           finished_events: List[Dict[str, Any]],
           unfinished_jobs: Dict[Any, Any],
           time_budget_s: float):
-    from main import reschedule_unfinished_jobs_ga
+    from environment.env_utils import reschedule_unfinished_jobs_ga
     current_time = env.current_time
     machine_pool = env.machine_pool
 
@@ -52,7 +52,7 @@ def mh_pso(env,
            finished_events: List[Dict[str, Any]],
            unfinished_jobs: Dict[Any, Any],
            time_budget_s: float):
-    from main import reschedule_unfinished_jobs_pso
+    from environment.env_utils import reschedule_unfinished_jobs_pso
     current_time = env.current_time
     machine_pool = env.machine_pool
 
@@ -77,7 +77,7 @@ def mh_edd(env,
     Đăng ký EDD như 1 "MH" để có thể dùng nó trong vector weight.
     Thực chất vẫn là reschedule_unfinished_jobs_edd.
     """
-    from main import reschedule_unfinished_jobs_edd
+    from environment.env_utils import reschedule_unfinished_jobs_edd
     current_time = env.current_time
     machine_pool = env.machine_pool
     return reschedule_unfinished_jobs_edd(

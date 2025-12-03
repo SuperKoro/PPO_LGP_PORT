@@ -1,0 +1,11 @@
+======================================================================
+TRACING CIRCULAR IMPORT ISSUE
+======================================================================
+
+Attempting: from core.lgp_program import LGPProgram
+----------------------------------------------------------------------
+
+SUCCESS! LGPProgram imported successfully
+LGPProgram: <class 'core.lgp_program.LGPProgram'>
+
+======================================================================

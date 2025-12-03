@@ -4,8 +4,8 @@ import numpy as np
 import random
 
 from config import LGPConfig
-from lgp_program import LGPProgram
-from lgp_generator import LGPGenerator
+from core.lgp_program import LGPProgram
+from core.lgp_generator import LGPGenerator
 
 
 def linear_crossover(

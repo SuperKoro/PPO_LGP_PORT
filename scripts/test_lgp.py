@@ -4,9 +4,9 @@ Quick validation that programs execute correctly
 """
 
 from typing import Dict
-from lgp_instructions import *
-from lgp_program import LGPProgram, PortfolioBuilder
-from lgp_generator import LGPGenerator
+from core.lgp_instructions import *
+from core.lgp_program import LGPProgram, PortfolioBuilder
+from core.lgp_generator import LGPGenerator
 from config import LGPConfig
 import random
 

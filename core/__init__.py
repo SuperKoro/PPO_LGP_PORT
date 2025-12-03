@@ -1,7 +1,6 @@
 # Core LGP components
-from .lgp_program import LGPProgram
-from .lgp_generator import LGPGenerator
-from .lgp_instructions import *
-from .lgp_evolution import *
+# Note: Using absolute imports to avoid circular dependencies
+# Users can either import from core.lgp_program directly
+# or from the core package
 
 __all__ = ['LGPProgram', 'LGPGenerator']
