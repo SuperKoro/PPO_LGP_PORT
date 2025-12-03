@@ -100,8 +100,8 @@ def main():
     # Initialize PPO model
     print(f"\n🧠 Creating PPO model...")
     model = PPOActorCritic(obs_dim, act_dim)
-    optimizer = optim.Adam(model.parameters(), lr=PPOConfig.lr)
-    print(f"✓ PPO model created with lr={PPOConfig.lr}")
+    optimizer = optim.Adam(model.parameters(), lr=PPOConfig.learning_rate)
+    print(f"✓ PPO model created with lr={PPOConfig.learning_rate}")
     
     # Configure coevolution
     print(f"\n⚙️  Configuring coevolution...")

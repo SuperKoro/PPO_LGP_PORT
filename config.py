@@ -11,7 +11,7 @@ Read comments carefully before modifying.
 # ============================================================================
 
 # Random seed for reproducibility
-RANDOM_SEED = 777
+RANDOM_SEED = 42
 
 # Output directory for results
 OUTPUT_DIR = "results"
@@ -65,7 +65,7 @@ class CoevolutionConfig:
     
     # Episodes per generation (Safe to modify)
     # More episodes = better fitness estimate but slower
-    episodes_per_gen = 500
+    episodes_per_gen = 200
     
     # Maximum steps per episode (⚠️ CAREFUL)
     # Too low: episodes end prematurely

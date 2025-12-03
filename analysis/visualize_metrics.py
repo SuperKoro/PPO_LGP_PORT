@@ -46,17 +46,18 @@ def load_generation_metrics(results_dir="results"):
         generations.append(gen_num)
         
         # Extract aggregate metrics
-        avg_metrics = data['average_metrics']
-        makespans_avg.append(avg_metrics['makespan_avg'])
-        makespans_std.append(avg_metrics['makespan_std'])
-        tardiness_avg.append(avg_metrics['total_tardiness_avg'])
+        agg_metrics = data['aggregated_metrics']
+        makespans_avg.append(agg_metrics['avg_makespan'])
+        makespans_std.append(agg_metrics['std_makespan'])
+        tardiness_total = agg_metrics['avg_tardiness_normal'] + agg_metrics['avg_tardiness_urgent']
+        tardiness_avg.append(tardiness_total)
         
         # Loss metrics (if available)
-        policy_losses_avg.append(avg_metrics.get('policy_loss_avg', 0))
-        policy_losses_std.append(avg_metrics.get('policy_loss_std', 0))
-        value_losses_avg.append(avg_metrics.get('value_loss_avg', 0))
-        value_losses_std.append(avg_metrics.get('value_loss_std', 0))
-        returns_avg.append(avg_metrics.get('return_avg', 0))
+        policy_losses_avg.append(agg_metrics.get('avg_policy_loss', 0))
+        policy_losses_std.append(agg_metrics.get('std_policy_loss', 0))
+        value_losses_avg.append(agg_metrics.get('avg_value_loss', 0))
+        value_losses_std.append(agg_metrics.get('std_value_loss', 0))
+        returns_avg.append(agg_metrics.get('avg_return', 0))
     
     return {
         'generations': generations,
@@ -72,7 +73,7 @@ def load_generation_metrics(results_dir="results"):
 
 
 def load_portfolio_fitness(results_dir="results"):
-    """Load fitness from portfolio summary files"""
+    """Load fitness from portfolio final files"""
     portfolios_dir = os.path.join(results_dir, "portfolios")
     
     generations = []
@@ -80,9 +81,9 @@ def load_portfolio_fitness(results_dir="results"):
     avg_fitness = []
     worst_fitness = []
     
-    # Find all generation summary files (not initial or final)
+    # Find all generation final files
     gen_files = sorted([f for f in os.listdir(portfolios_dir) 
-                       if f.startswith("generation_") and f.endswith("_summary.json")])
+                       if f.startswith("generation_") and f.endswith("_final.json")])
     
     for gen_file in gen_files:
         filepath = os.path.join(portfolios_dir, gen_file)
@@ -93,12 +94,18 @@ def load_portfolio_fitness(results_dir="results"):
         generations.append(gen_num)
         
         # Get fitness from elite portfolios
-        elite = data['elite_portfolios']
-        fitnesses = [p['fitness'] for p in elite]
+        elite = data['elite']  # Changed from 'elite_portfolios' to 'elite'
+        fitnesses = [p['fitness'] for p in elite if p['fitness'] is not None]
         
-        best_fitness.append(max(fitnesses))  # Remember: reward, higher is better
-        avg_fitness.append(np.mean(fitnesses))
-        worst_fitness.append(min(fitnesses))
+        if fitnesses:
+            best_fitness.append(max(fitnesses))  # Remember: reward, higher is better
+            avg_fitness.append(np.mean(fitnesses))
+            worst_fitness.append(min(fitnesses))
+        else:
+            # Fallback if no valid fitness
+            best_fitness.append(-1000)
+            avg_fitness.append(-1000)
+            worst_fitness.append(-1000)
     
     return {
         'generations': generations,

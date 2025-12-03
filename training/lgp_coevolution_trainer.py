@@ -70,19 +70,30 @@ def save_generation_metrics(generation: int, episodes_metrics: List[Dict[str, An
 def portfolio_to_dict(individual: ActionIndividual, index: int = None, fitness: float = None, usage: int = None):
     """Convert ActionIndividual to dictionary format."""
     result = {
-        "index": index,
+        "index": int(index) if index is not None else None,
         "fitness": float(fitness) if fitness is not None else None,
         "usage": int(usage) if usage is not None else 0,
         "dr": individual.dr_gene.name,
-        "mh_genes": [{"name": g.name, "weight": g.w_raw} for g in individual.mh_genes]
+        "mh_genes": [{"name": g.name, "weight": float(g.w_raw)} for g in individual.mh_genes]
     }
     return result
 
 
-def save_portfolios_json(portfolios_data: Dict[str, Any], filename: str):
-    """Save portfolios to JSON file."""
-    with open(filename, 'w') as f:
-        json.dump(portfolios_data, f, indent=2)
+def save_portfolios_json(portfolios_data, filepath):
+    """Save portfolios data to JSON file with numpy type handling."""
+    # Custom encoder to handle numpy types
+    class NumpyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return super(NumpyEncoder, self).default(obj)
+    
+    with open(filepath, 'w') as f:
+        json.dump(portfolios_data, f, indent=2, cls=NumpyEncoder)
 
 
 def save_final_results(env, output_dir: str, generation: int):
@@ -102,7 +113,6 @@ def save_final_results(env, output_dir: str, generation: int):
 def _select_elite_indices(fitness: np.ndarray, elite_size: int):
     """Select top elite indices based on fitness."""
     return np.argsort(fitness)[::-1][:elite_size]
-
 
 
 def build_lgp_inputs_for_env(env) -> Dict[str, float]:

@@ -1,0 +1,8 @@
+{
+  "generation": 10,
+  "metrics": {
+    "makespan": 185,
+    "tardiness_normal": 0,
+    "tardiness_urgent": 0
+  }
+}
