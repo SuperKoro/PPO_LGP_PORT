@@ -67,22 +67,3 @@ def mh_pso(env,
         iterations=iterations
     )
 
-
-@register_mh("EDD")
-def mh_edd(env,
-           finished_events: List[Dict[str, Any]],
-           unfinished_jobs: Dict[Any, Any],
-           time_budget_s: float):
-    """
-    Đăng ký EDD như 1 "MH" để có thể dùng nó trong vector weight.
-    Thực chất vẫn là reschedule_unfinished_jobs_edd.
-    """
-    from environment.env_utils import reschedule_unfinished_jobs_edd
-    current_time = env.current_time
-    machine_pool = env.machine_pool
-    return reschedule_unfinished_jobs_edd(
-        unfinished_jobs,
-        current_time,
-        finished_events,
-        machine_pool
-    )

@@ -122,7 +122,7 @@ class LGPConfig:
     
     # Available Metaheuristics (Safe to modify)
     # Add/remove MHs as needed (must be registered first!)
-    available_mh = ["SA", "GA", "PSO", "EDD"]
+    available_mh = ["SA", "GA", "PSO"]
     
     # Time budget for portfolio execution (⚠️ CAREFUL)
     # Too low: MHs can't optimize properly

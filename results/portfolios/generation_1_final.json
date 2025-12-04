@@ -28,7 +28,7 @@
       "dr": "SPT",
       "mh_genes": [
         {
-          "name": "GA",
+          "name": "SA",
           "weight": 0.0
         },
         {
@@ -52,7 +52,7 @@
           "weight": 0.0
         },
         {
-          "name": "SA",
+          "name": "GA",
           "weight": 0.0
         },
         {
@@ -63,12 +63,12 @@
     },
     {
       "index": 2,
-      "fitness": -155.21067810058594,
-      "usage": 992,
+      "fitness": -155.70408630371094,
+      "usage": 392,
       "dr": "EDD",
       "mh_genes": [
         {
-          "name": "EDD",
+          "name": "PSO",
           "weight": 0.0
         },
         {
@@ -88,11 +88,11 @@
       "dr": "EDD",
       "mh_genes": [
         {
-          "name": "EDD",
+          "name": "SA",
           "weight": 0.0
         },
         {
-          "name": "EDD",
+          "name": "SA",
           "weight": 0.0
         },
         {
@@ -112,7 +112,7 @@
           "weight": 20.0
         },
         {
-          "name": "PSO",
+          "name": "GA",
           "weight": 0.0
         },
         {
@@ -212,7 +212,7 @@
           "weight": 8.828240193732261
         },
         {
-          "name": "GA",
+          "name": "SA",
           "weight": 0.5412794876682303
         },
         {
@@ -228,7 +228,7 @@
       "dr": "EDD",
       "mh_genes": [
         {
-          "name": "EDD",
+          "name": "SA",
           "weight": 0.0
         },
         {
@@ -236,7 +236,7 @@
           "weight": 0.0
         },
         {
-          "name": "EDD",
+          "name": "SA",
           "weight": 0.0
         }
       ]
@@ -268,7 +268,7 @@
       "dr": "SPT",
       "mh_genes": [
         {
-          "name": "SA",
+          "name": "PSO",
           "weight": 4.6247007536879945
         },
         {
@@ -296,7 +296,7 @@
           "weight": 0.0
         },
         {
-          "name": "EDD",
+          "name": "SA",
           "weight": 0.0
         }
       ]
@@ -308,7 +308,7 @@
       "dr": "CR",
       "mh_genes": [
         {
-          "name": "SA",
+          "name": "PSO",
           "weight": 20.0
         },
         {
@@ -316,7 +316,7 @@
           "weight": 0.0
         },
         {
-          "name": "SA",
+          "name": "GA",
           "weight": 2.140854115683797
         }
       ]
@@ -325,7 +325,7 @@
   "all_fitness": [
     -113.0,
     -112.66666412353516,
-    -155.21067810058594,
+    -155.70408630371094,
     -136.0,
     -1000000000.0,
     -1000000000.0,
@@ -391,7 +391,7 @@
   "all_usage": [
     1,
     3,
-    992,
+    392,
     4,
     0,
     0,

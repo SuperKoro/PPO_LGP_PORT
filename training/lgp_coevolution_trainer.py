@@ -159,7 +159,7 @@ def build_lgp_inputs_for_env(env) -> Dict[str, float]:
 def make_fallback_individual() -> ActionIndividual:
     """
     Portfolio fallback nếu LGPProgram bị lỗi runtime.
-    EDD + 1 SA, các MH còn lại weight 0.
+    First available DR (typically EDD) + first available MH (typically SA) with weight 1.0.
     """
     genes = [
         Gene(kind="DR", name=LGPConfig.available_dr[0], w_raw=1.0),
