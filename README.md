@@ -49,40 +49,48 @@ Example portfolio output from LGP: `EDD | SA:52%, GA:25%, PSO:23%`
 ```
 PPO_LGP_Clean/
 ├── core/                   # LGP components
-│   ├── lgp_program.py
-│   ├── lgp_generator.py
-│   ├── lgp_instructions.py
-│   └── lgp_evolution.py
+│   ├── __init__.py
+│   ├── lgp_program.py      # LGP program representation
+│   ├── lgp_generator.py    # Generate LGP programs
+│   ├── lgp_instructions.py # LGP instruction set (8 types)
+│   └── lgp_evolution.py    # Evolution operators
 ├── environment/            # Scheduling environment
-│   ├── scheduling_env.py   (to be created)
-│   └── env_utils.py
+│   ├── __init__.py
+│   ├── scheduling_env.py   # Gym-style scheduling env
+│   └── env_utils.py        # Utility functions
 ├── registries/             # DR and MH registries
-│   ├── dispatching_registry.py
-│   ├── dispatching_rules.py
-│   ├── mh_registry.py
-│   └── metaheuristics_impl.py
+│   ├── __init__.py
+│   ├── dispatching_registry.py  # DR registry
+│   ├── dispatching_rules.py     # DR implementations (EDD, SPT, CR)
+│   ├── mh_registry.py           # MH registry
+│   └── metaheuristics_impl.py   # MH implementations (SA, GA, PSO)
 ├── training/               # Training components
-│   ├── ppo_model.py        (to be created)
-│   ├── lgp_coevolution_trainer.py
-│   └── training_utils.py   (to be created)
+│   ├── __init__.py
+│   ├── ppo_model.py              # PPO actor-critic model
+│   ├── lgp_coevolution_trainer.py # Coevolution training loop
+│   ├── typed_action_adapter.py   # Action adapter
+│   └── portfolio_types.py        # Portfolio data structures
 ├── scripts/                # Executable scripts
-│   ├── train_lgp.py        (to be created)
-│   ├── test_lgp.py
-│   └── inference.py
+│   ├── __init__.py
+│   ├── train_lgp.py        # Main training script
+│   ├── test_lgp.py         # Testing script
+│   └── inference.py        # Inference script
 ├── analysis/               # Visualization tools
-│   ├── visualize_metrics.py
-│   ├── analyze_evolution.py
-│   └── compare_programs.py (to be created)
+│   ├── __init__.py
+│   ├── visualize_metrics.py # Plot training metrics
+│   └── analyze_evolution.py # Analyze LGP evolution
 ├── data/                   # Job shop instances
-│   └── Set*.json
-├── results/                # Training results
-│   ├── metrics/
-│   ├── programs/
-│   ├── models/
-│   └── plots/
-├── config.py
-├── requirements.txt
-└── README.md
+│   └── Set*.json           # Training datasets
+├── results/                # Training outputs
+│   ├── metrics/            # JSON metrics per generation
+│   ├── programs/           # Saved LGP programs
+│   ├── models/             # Trained PPO models
+│   └── plots/              # Generated visualizations
+├── .env.example            # Environment template
+├── .gitignore              # Git ignore rules
+├── config.py               # Central configuration
+├── requirements.txt        # Python dependencies
+└── README.md               # This file
 ```
 
 ## 🚀 Installation
@@ -93,6 +101,10 @@ cd PPO_LGP_Clean
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Setup environment variables (if using API keys)
+cp .env.example .env
+# Edit .env and add your actual API keys
 ```
 
 ### Requirements
@@ -101,6 +113,8 @@ pip install -r requirements.txt
 - torch >= 1.10.0
 - gym >= 0.21.0
 - matplotlib >= 3.5.0
+- python-dotenv >= 0.19.0 (for environment variables)
+- openpyxl >= 3.0.0 (for Excel support)
 
 ## 📊 Usage
 
@@ -148,6 +162,38 @@ python scripts/inference.py
 ```
 
 Loads trained model and runs test episodes.
+
+## 🔒 Security Best Practices
+
+### API Keys & Secrets
+
+This project uses environment variables to protect sensitive information like API keys.
+
+**Never commit `.env` to Git!** It's already in `.gitignore`.
+
+**Setup**:
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` and add your actual keys:
+   ```
+   API_KEY=your_actual_api_key_here
+   ```
+
+3. Use in Python code:
+   ```python
+   from dotenv import load_dotenv
+   import os
+   
+   load_dotenv()
+   api_key = os.getenv("API_KEY")
+   ```
+
+> ⚠️ **Important**: If you accidentally committed an API key, **revoke it immediately** and generate a new one. Git history preserves all changes!
+
+---
 
 ## 📈 LGP Program Structure
 
@@ -227,11 +273,7 @@ Analyzes LGP evolution:
 - Register usage patterns
 - Genetic diversity metrics
 
-### compare_programs.py (to be created)
-Compares different LGP programs:
-- Head-to-head performance
-- Portfolio composition analysis
-- Instruction pattern comparison
+
 
 ## 🔬 Research Focus
 
