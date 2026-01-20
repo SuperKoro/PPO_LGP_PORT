@@ -37,6 +37,7 @@ import registries.metaheuristics_impl
 # Import training components
 from training.ppo_model import PPOActorCritic, select_action, compute_returns
 from training.lgp_coevolution_trainer import train_with_coevolution_lgp, CoevolutionConfig as CoevoCfg
+from training.portfolio_types import ActionIndividual, Gene
 from environment.scheduling_env import DynamicSchedulingEnv
 
 
@@ -65,6 +66,30 @@ def initialize_lgp_programs(pool_size, max_length, min_length, num_registers, se
     return programs
 
 
+def create_dummy_action_library(pool_size: int):
+    """
+    Create dummy action library with correct size for environment initialization.
+    This ensures action_space.n matches pool_size from the start.
+    
+    The actual portfolios will be replaced by LGP-generated ones during training,
+    but we need the correct size for PPO model initialization.
+    """
+    dummy_library = []
+    for i in range(pool_size):
+        # Create a simple portfolio: EDD + SA (3 MH genes)
+        genes = [
+            Gene(kind="DR", name=LGPConfig.available_dr[i % len(LGPConfig.available_dr)], w_raw=1.0),
+        ]
+        # Add MH genes
+        for j in range(LGPConfig.n_mh_genes):
+            mh_name = LGPConfig.available_mh[(i + j) % len(LGPConfig.available_mh)]
+            genes.append(Gene(kind="MH", name=mh_name, w_raw=random.uniform(0.1, 1.0)))
+        
+        dummy_library.append(ActionIndividual(genes=genes))
+    
+    return dummy_library
+
+
 def main():
     """Main training entry point."""
     print("=" * 70)
@@ -75,7 +100,7 @@ def main():
     set_random_seeds(RANDOM_SEED)
     print(f"✓ Random seed set to: {RANDOM_SEED}")
     
-    # Initialize LGP programs
+    # Initialize LGP programs FIRST
     print(f"\n📋 Initializing {LGPConfig.pool_size} LGP programs...")
     lgp_programs = initialize_lgp_programs(
         pool_size=LGPConfig.pool_size,
@@ -86,16 +111,27 @@ def main():
     )
     print(f"✓ Initialized {len(lgp_programs)} programs")
     
-    # Initialize environment
+    # Create dummy action library with CORRECT SIZE (= pool_size)
+    # This ensures environment's action_space matches the number of LGP programs
+    print(f"\n📦 Creating action library with {LGPConfig.pool_size} slots...")
+    dummy_action_library = create_dummy_action_library(LGPConfig.pool_size)
+    print(f"✓ Action library created with {len(dummy_action_library)} portfolios")
+    
+    # Initialize environment WITH CORRECT ACTION LIBRARY SIZE
     print(f"\n🏭 Creating scheduling environment...")
     env = DynamicSchedulingEnv(
         lambda_tardiness=EnvironmentConfig.lambda_tardiness,
-        action_library=None,  # Will be set by LGP
+        action_library=dummy_action_library,  # FIX: Pass dummy library with correct size!
         action_budget_s=LGPConfig.action_budget_s
     )
     obs_dim = env.observation_space.shape[0]
-    act_dim = env.action_space.n
+    act_dim = env.action_space.n  # Now act_dim = pool_size = 64
     print(f"✓ Environment created: obs_dim={obs_dim}, act_dim={act_dim}")
+    
+    # Verify action space matches pool size
+    assert act_dim == LGPConfig.pool_size, \
+        f"❌ ACTION SPACE MISMATCH! act_dim={act_dim} but pool_size={LGPConfig.pool_size}"
+    print(f"✓ Action space verified: {act_dim} actions = {LGPConfig.pool_size} LGP programs")
     
     # Initialize PPO model
     print(f"\n🧠 Creating PPO model...")

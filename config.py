@@ -28,7 +28,8 @@ class PPOConfig:
     """PPO Agent hyperparameters"""
     
     # Learning rate (Safe to tune: 1e-5 to 1e-3)
-    learning_rate = 3e-4
+    # NOTE: Lower LR helps stability with large action space
+    learning_rate = 1e-4  # Reduced from 3e-4 to prevent policy collapse
     
     # Discount factor (⚠️ CAREFUL: affects long-term planning)
     # Recommended range: 0.85 - 0.99
@@ -45,7 +46,9 @@ class PPOConfig:
     
     # Entropy coefficient for exploration
     # Safe to tune: 0.001 - 0.05
-    entropy_coef = 0.01
+    # NOTE: With 64 discrete actions, higher entropy helps exploration
+    # Strategy A: Moderate entropy for balance between exploration and exploitation
+    entropy_coef = 0.2  # Reduced from 0.3 - balanced exploration/exploitation
     
     # Generalized Advantage Estimation lambda (⚠️ CAREFUL)
     # Recommended: 0.9 - 0.99
@@ -61,13 +64,14 @@ class CoevolutionConfig:
     
     # Number of generations (Safe to modify)
     # Training time scales linearly with this
-    num_generations = 10
+    num_generations = 20  # Full training
     
     # Episodes per generation (Safe to modify)
     # More episodes = better fitness estimate but slower
-    episodes_per_gen = 200
+    # Strategy A: Moderate increase for good coverage without excessive training time
+    episodes_per_gen = 400  # Full training
     
-    # Maximum steps per episode (⚠️ CAREFUL)
+    # Maximum steps per episode (⚠️ 
     # Too low: episodes end prematurely
     # Too high: wasted computation
     max_steps_per_episode = 200
@@ -77,12 +81,13 @@ class CoevolutionConfig:
     # Number of elite portfolios to keep (⚠️ CRITICAL)
     # MUST be < pool_size and > n_replace
     # Recommended: 20-30% of pool_size
-    elite_size = 16
+    # Strategy A: Adjusted for pool_size=64
+    elite_size = 16  # 25% of pool_size
     
     # Number of portfolios to replace each generation (⚠️ CRITICAL)
     # MUST be < elite_size
     # Recommended: 5-10% of pool_size
-    n_replace = 4
+    n_replace = 6  # ~10% of pool_size
     
     # Warmup episodes before starting evolution
     # Safe to modify: 1-5
@@ -220,7 +225,7 @@ def validate_config():
         if critical_errors:
             raise ValueError("Configuration has critical errors. Please fix them!")
     else:
-        print("✅ Configuration validated successfully!")
+        print("Configuration validated successfully!")
 
 
 def print_config_summary():

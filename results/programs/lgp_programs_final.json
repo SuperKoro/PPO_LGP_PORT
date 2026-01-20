@@ -5,6 +5,301 @@
       "num_registers": 20,
       "instructions": [
         {
+          "type": "CLAMP_MAX",
+          "dest": 12,
+          "src": 12,
+          "maximum": 2.0
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 13,
+          "src": 10
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 7,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 4,
+          "threshold": 38.99684912344314,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 8,
+          "op": "+",
+          "src1": 14,
+          "src2": 13,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 6,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "ARITH",
+          "dest": 11,
+          "op": "+",
+          "src1": 3,
+          "src2": 9,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 13,
+          "op": "*",
+          "src1": 4,
+          "src2": 7,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 4,
+          "op": "+",
+          "src1": 9,
+          "src2": 5,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 14,
+          "threshold": 27.797688077419412,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "-",
+          "src1": 4,
+          "src2": 1,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 15,
+          "op": "+",
+          "src1": 11,
+          "src2": 4.375748980394379,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 8,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "ARITH",
+          "dest": 5,
+          "op": "-",
+          "src1": 6,
+          "src2": -0.5656867616401122,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 13,
+          "op": "+",
+          "src1": 3,
+          "src2": 14,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "/",
+          "src1": 12,
+          "src2": 12,
+          "src2_is_const": false
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 8,
+          "reg_weight": null
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH1",
+          "reg_name": 14,
+          "reg_weight": 9
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH2",
+          "reg_name": 8,
+          "reg_weight": 11
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH3",
+          "reg_name": 11,
+          "reg_weight": 17
+        }
+      ]
+    },
+    {
+      "num_registers": 20,
+      "instructions": [
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "/",
+          "src1": 6,
+          "src2": 10,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "/",
+          "src1": 13,
+          "src2": 1.1147805989176742,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 1,
+          "src": 1,
+          "maximum": 2.0
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 9,
+          "src": 16
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 15,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "ARITH",
+          "dest": 8,
+          "op": "*",
+          "src1": 14,
+          "src2": -1.5767298231815383,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 11,
+          "value": 6.100765800787515
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 8,
+          "src2": -2.751329620071833,
+          "src2_is_const": true
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 6
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 8,
+          "threshold": 6.863647740046147,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 15,
+          "op": "-",
+          "src1": 12,
+          "src2": 4.546088633914614,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "*",
+          "src1": 2,
+          "src2": 14,
+          "src2_is_const": false
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 9,
+          "src": 6
+        },
+        {
+          "type": "CLAMP_MIN",
+          "dest": 8,
+          "src": 8,
+          "minimum": 0.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 14,
+          "op": "*",
+          "src1": 17,
+          "src2": 2.9540535600233353,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 8,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "ARITH",
+          "dest": 5,
+          "op": "+",
+          "src1": 11,
+          "src2": 3,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "/",
+          "src1": 13,
+          "src2": 3.845519975872275,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 11,
+          "src": 11,
+          "maximum": 2.0
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 3,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 10,
+          "src": 18
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 8,
+          "reg_weight": null
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH1",
+          "reg_name": 15,
+          "reg_weight": 16
+        }
+      ]
+    },
+    {
+      "num_registers": 20,
+      "instructions": [
+        {
           "type": "ARITH",
           "dest": 6,
           "op": "/",
@@ -13,617 +308,38 @@
           "src2_is_const": false
         },
         {
-          "type": "ARITH",
-          "dest": 3,
-          "op": "/",
-          "src1": 10,
-          "src2": 19,
-          "src2_is_const": false
-        },
-        {
           "type": "CLAMP_MIN",
-          "dest": 11,
-          "src": 11,
+          "dest": 19,
+          "src": 19,
           "minimum": 0.0
         },
         {
           "type": "ARITH",
-          "dest": 6,
-          "op": "+",
-          "src1": 7,
-          "src2": 12,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "+",
-          "src1": 10,
-          "src2": 1.1402536702943884,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 3,
-          "op": "/",
-          "src1": 2,
-          "src2": -0.2833133991165626,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 11,
-          "op": "+",
-          "src1": 7,
-          "src2": 19,
-          "src2_is_const": false
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 15,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 15,
-          "reg_weight": 19
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 12,
-          "reg_weight": 4
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 8,
-          "reg_weight": 18
-        }
-      ]
-    },
-    {
-      "num_registers": 20,
-      "instructions": [
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 5,
-          "reg_weight": 3
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 7,
-          "value": 4.635789530716352
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 17,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 5,
-          "reg_weight": 19
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 6,
-          "reg_weight": 8
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "/",
-          "src1": 8,
-          "src2": 14,
-          "src2_is_const": false
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 19,
-          "reg_weight": 3
-        }
-      ]
-    },
-    {
-      "num_registers": 20,
-      "instructions": [
-        {
-          "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 3,
-          "op": "*",
-          "src1": 12,
-          "src2": 14,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 17,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 9,
-          "src": 4
-        },
-        {
-          "type": "ARITH",
-          "dest": 4,
-          "op": "*",
-          "src1": 18,
-          "src2": -4.390424285234841,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
           "dest": 18,
           "op": "+",
-          "src1": 16,
-          "src2": 0.31126135270541333,
-          "src2_is_const": true
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 2,
-          "threshold": 42.567127267206075,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 10,
-          "value": 4.037755513182775
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 18,
-          "threshold": 12.310767389431243,
-          "skip_count": 3,
-          "comparison": ">"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 16,
-          "value": 6.573731644725225
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 10,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "*",
-          "src1": 7,
-          "src2": 4,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 2,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 18,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "+",
-          "src1": 16,
-          "src2": 11,
-          "src2_is_const": false
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 11,
-          "src": 11,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "+",
-          "src1": 17,
-          "src2": 1.116777657259501,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 9.317560394360774
-        },
-        {
-          "type": "ARITH",
-          "dest": 7,
-          "op": "-",
-          "src1": 8,
-          "src2": 3,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "/",
-          "src1": 10,
-          "src2": 8,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 4,
-          "op": "+",
-          "src1": 2,
-          "src2": 3.293480893722192,
+          "src1": 19,
+          "src2": 3.7775263774296803,
           "src2_is_const": true
         },
         {
           "type": "ARITH",
           "dest": 7,
-          "op": "/",
-          "src1": 8,
-          "src2": 14,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 3,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 7,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 4,
-          "reg_weight": 14
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 7,
-          "reg_weight": 16
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 7,
-          "reg_weight": 4
-        }
-      ]
-    },
-    {
-      "num_registers": 20,
-      "instructions": [
-        {
-          "type": "CLAMP_MAX",
-          "dest": 0,
-          "src": 0,
-          "maximum": 2.0
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 5,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 3,
-          "value": 4.520532285684933
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "+",
-          "src1": 18,
-          "src2": -0.10422909369983557,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 7,
-          "value": 2.7746773573456007
-        },
-        {
-          "type": "ARITH",
-          "dest": 19,
-          "op": "*",
-          "src1": 6,
-          "src2": -3.446228687734144,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 5,
-          "op": "-",
-          "src1": 9,
-          "src2": 2.2995837743154146,
-          "src2_is_const": true
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 9,
-          "threshold": 36.743718272059326,
-          "skip_count": 3,
-          "comparison": "<"
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 7,
-          "threshold": 16.294311872145272,
-          "skip_count": 2,
-          "comparison": "<"
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "+",
-          "src1": 18,
-          "src2": -3.200727873913003,
-          "src2_is_const": true
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 8,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 18,
-          "reg_weight": 14
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 19,
-          "reg_weight": 19
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 11,
-          "reg_weight": 8
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "-",
-          "src1": 11,
-          "src2": 3.920063921974087,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 3,
-          "op": "*",
-          "src1": 7,
-          "src2": 11,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "+",
-          "src1": 16,
-          "src2": -3.3297981273169066,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "*",
-          "src1": 14,
-          "src2": 0.9636991861550239,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 4,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 15,
-          "threshold": 17.96254431833162,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 12,
-          "threshold": 0.9562366561659708,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "ARITH",
-          "dest": 3,
-          "op": "+",
-          "src1": 18,
-          "src2": -3.7683801824903904,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 11,
-          "op": "+",
-          "src1": 17,
-          "src2": 0.9392406787485053,
-          "src2_is_const": true
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 6,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 3,
-          "reg_weight": 4
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 6,
-          "reg_weight": 16
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 17,
-          "reg_weight": 15
-        }
-      ]
-    },
-    {
-      "num_registers": 20,
-      "instructions": [
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 4,
-          "threshold": 3.858254215043816,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 7,
-          "value": 5.9724644107162845
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
           "op": "/",
           "src1": 19,
-          "src2": -3.344608342559413,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 14,
-          "op": "/",
-          "src1": 7,
-          "src2": 1.1059542212581572,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "-",
-          "src1": 9,
-          "src2": 2.8437023959320484,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "/",
-          "src1": 14,
-          "src2": 2.7812403724992594,
+          "src2": -4.987997941898633,
           "src2_is_const": true
         },
         {
           "type": "COND_SKIP",
-          "cond_reg": 6,
-          "threshold": 40.06296120757738,
-          "skip_count": 1,
+          "cond_reg": 17,
+          "threshold": 13.030816072027873,
+          "skip_count": 3,
           "comparison": "<"
         },
         {
-          "type": "ARITH",
-          "dest": 18,
-          "op": "+",
-          "src1": 11,
-          "src2": -3.9741026825159063,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "-",
-          "src1": 8,
-          "src2": 16,
-          "src2_is_const": false
-        },
-        {
           "type": "LOAD_CONST",
-          "dest": 8,
-          "value": 1.0018068906370903
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 2,
-          "src": 2,
-          "minimum": 0.0
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 7,
-          "threshold": 40.83516279277502,
-          "skip_count": 2,
-          "comparison": ">"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "*",
-          "src1": 2,
-          "src2": 0,
-          "src2_is_const": false
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 10,
-          "threshold": 39.5690318741088,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "ARITH",
-          "dest": 18,
-          "op": "+",
-          "src1": 4,
-          "src2": -0.3088987284450626,
-          "src2_is_const": true
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 5,
-          "reg_weight": null
+          "dest": 7,
+          "value": 3.6581863010300952
         },
         {
           "type": "ARITH",
@@ -674,6 +390,118 @@
           "type": "COPY_REG",
           "dest": 11,
           "src": 16
+        },
+        {
+          "type": "CLAMP_MIN",
+          "dest": 8,
+          "src": 8,
+          "minimum": 0.0
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 18,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "ARITH",
+          "dest": 15,
+          "op": "+",
+          "src1": 11,
+          "src2": 3.982266175409336,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 12,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 11,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 15,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "ARITH",
+          "dest": 7,
+          "op": "*",
+          "src1": 14,
+          "src2": 2,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 8,
+          "op": "-",
+          "src1": 5,
+          "src2": 3,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 10,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "ARITH",
+          "dest": 18,
+          "op": "/",
+          "src1": 15,
+          "src2": 5,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 4,
+          "op": "+",
+          "src1": 4,
+          "src2": -3.38870859632462,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 4,
+          "src": 4,
+          "maximum": 2.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 11,
+          "op": "+",
+          "src1": 5,
+          "src2": -0.9454368353368707,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 9,
+          "src": 9,
+          "maximum": 2.0
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 6,
+          "threshold": 22.460168080972835,
+          "skip_count": 2,
+          "comparison": "<"
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "-",
+          "src1": 19,
+          "src2": 18,
+          "src2_is_const": false
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 19,
+          "reg_weight": null
         }
       ]
     },
@@ -681,195 +509,221 @@
       "num_registers": 20,
       "instructions": [
         {
+          "type": "LOAD_INPUT",
+          "dest": 5,
+          "input_key": "avg_processing_time"
+        },
+        {
           "type": "ARITH",
-          "dest": 11,
+          "dest": 12,
           "op": "+",
-          "src1": 7,
-          "src2": 3,
+          "src1": 12,
+          "src2": 10,
           "src2_is_const": false
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 1,
-          "input_key": "num_jobs"
+          "type": "COPY_REG",
+          "dest": 5,
+          "src": 10
         },
         {
           "type": "ARITH",
-          "dest": 10,
-          "op": "/",
-          "src1": 16,
-          "src2": 0.6124506293861298,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 11,
-          "op": "/",
-          "src1": 0,
-          "src2": -3.403406836231099,
-          "src2_is_const": true
+          "dest": 15,
+          "op": "-",
+          "src1": 9,
+          "src2": 19,
+          "src2_is_const": false
         },
         {
           "type": "ARITH",
           "dest": 7,
-          "op": "+",
-          "src1": 6,
-          "src2": -1.6340545488737321,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 14,
-          "op": "/",
+          "op": "-",
           "src1": 11,
-          "src2": 3.0712827327438017,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 19,
-          "input_key": "avg_processing_time"
+          "src2": 12,
+          "src2_is_const": false
         },
         {
           "type": "LOAD_INPUT",
           "dest": 2,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 9.852215206607578
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 3,
-          "src": 3,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "-",
-          "src1": 11,
-          "src2": 11,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 5,
-          "value": 6.091310056669882
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "-",
-          "src1": 5,
-          "src2": 8,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 4,
-          "value": 2.2904807196410437
-        },
-        {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "*",
-          "src1": 12,
-          "src2": 6,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 18,
-          "op": "-",
-          "src1": 12,
-          "src2": 1.4285187020042418,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "/",
-          "src1": 17,
-          "src2": 2.4701381165225786,
-          "src2_is_const": true
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 12,
-          "src": 12,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 7,
-          "op": "+",
-          "src1": 16,
-          "src2": 1,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "/",
-          "src1": 13,
-          "src2": -1.1523268832549993,
-          "src2_is_const": true
+          "input_key": "avg_processing_time"
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 17,
+          "dest": 10,
           "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 6,
-          "value": 6.817103690265748
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 8,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "*",
-          "src1": 13,
-          "src2": 0,
-          "src2_is_const": false
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 5,
-          "threshold": 25.38408373021626,
-          "skip_count": 1,
-          "comparison": "<"
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 16,
-          "src": 16,
-          "minimum": 0.0
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 7,
-          "value": 3.7391385259114793
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 8,
+          "reg_name": 11,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 19,
-          "reg_weight": 3
+          "reg_name": 5,
+          "reg_weight": 14
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH2",
+          "reg_name": 11,
+          "reg_weight": 5
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH3",
+          "reg_name": 14,
+          "reg_weight": 8
+        }
+      ]
+    },
+    {
+      "num_registers": 20,
+      "instructions": [
+        {
+          "type": "LOAD_INPUT",
+          "dest": 10,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 6,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 13,
+          "src": 0
+        }
+      ]
+    },
+    {
+      "num_registers": 20,
+      "instructions": [
+        {
+          "type": "LOAD_CONST",
+          "dest": 14,
+          "value": 1.6633849328011152
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 15,
+          "value": 9.668111335686056
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "/",
+          "src1": 8,
+          "src2": 14,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 0,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 3,
+          "value": 6.414227464816396
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 4,
+          "value": 7.008820313830021
+        },
+        {
+          "type": "ARITH",
+          "dest": 19,
+          "op": "+",
+          "src1": 3,
+          "src2": 9,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "/",
+          "src1": 12,
+          "src2": 0,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 10,
+          "value": 1.4067978971908934
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 4,
+          "src2": 2.9677043704304555,
+          "src2_is_const": true
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 4,
+          "threshold": 14.902825160804777,
+          "skip_count": 3,
+          "comparison": "<"
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 0,
+          "threshold": 27.676209388213945,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 3,
+          "op": "+",
+          "src1": 18,
+          "src2": 0.37152048554460926,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 14,
+          "op": "-",
+          "src1": 6,
+          "src2": 16,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "-",
+          "src1": 19,
+          "src2": -3.0567378465367456,
+          "src2_is_const": true
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 17,
+          "reg_weight": null
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH1",
+          "reg_name": 16,
+          "reg_weight": 15
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH2",
+          "reg_name": 3,
+          "reg_weight": 9
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH3",
+          "reg_name": 9,
+          "reg_weight": 11
         }
       ]
     },
@@ -879,145 +733,142 @@
         {
           "type": "COPY_REG",
           "dest": 11,
-          "src": 7
+          "src": 10
         },
         {
-          "type": "LOAD_CONST",
-          "dest": 10,
-          "value": 5.533966317847301
+          "type": "CLAMP_MAX",
+          "dest": 8,
+          "src": 8,
+          "maximum": 2.0
         },
         {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 7.789696525132599
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 2.0544571815244197
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 9,
-          "value": 7.478436409812495
+          "type": "LOAD_INPUT",
+          "dest": 16,
+          "input_key": "num_jobs"
         },
         {
           "type": "ARITH",
-          "dest": 4,
-          "op": "-",
+          "dest": 16,
+          "op": "/",
+          "src1": 15,
+          "src2": -2.5967606387578446,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 18,
+          "value": 4.481745495865708
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "*",
           "src1": 7,
-          "src2": 3,
+          "src2": 7,
           "src2_is_const": false
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 19,
-          "input_key": "num_jobs"
+          "type": "LOAD_CONST",
+          "dest": 14,
+          "value": 4.732604887595247
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 0,
+          "dest": 13,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 11,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 9,
           "input_key": "avg_processing_time"
+        },
+        {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "-",
+          "src1": 10,
+          "src2": 17,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 18,
+          "op": "*",
+          "src1": 8,
+          "src2": 4.766070228830568,
+          "src2_is_const": true
         },
         {
           "type": "COND_SKIP",
-          "cond_reg": 4,
-          "threshold": 19.341912441258874,
-          "skip_count": 3,
-          "comparison": "<"
+          "cond_reg": 6,
+          "threshold": 14.812323163257224,
+          "skip_count": 2,
+          "comparison": ">"
         },
         {
           "type": "ARITH",
-          "dest": 8,
-          "op": "+",
-          "src1": 15,
-          "src2": 2.7036704922461388,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 0,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "ARITH",
-          "dest": 4,
-          "op": "/",
-          "src1": 12,
-          "src2": 1.2857069606057605,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "num_jobs"
+          "dest": 7,
+          "op": "*",
+          "src1": 8,
+          "src2": 1,
+          "src2_is_const": false
         },
         {
           "type": "LOAD_CONST",
           "dest": 7,
-          "value": 2.7746773573456007
+          "value": 6.378696551059275
         },
         {
-          "type": "ARITH",
-          "dest": 19,
-          "op": "*",
-          "src1": 6,
-          "src2": -3.446228687734144,
-          "src2_is_const": true
+          "type": "COPY_REG",
+          "dest": 3,
+          "src": 3
         },
         {
-          "type": "ARITH",
+          "type": "LOAD_INPUT",
+          "dest": 15,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "LOAD_INPUT",
           "dest": 5,
-          "op": "-",
-          "src1": 9,
-          "src2": 2.2995837743154146,
-          "src2_is_const": true
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 9,
-          "threshold": 36.743718272059326,
-          "skip_count": 3,
-          "comparison": "<"
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 7,
-          "threshold": 16.294311872145272,
-          "skip_count": 2,
-          "comparison": "<"
+          "input_key": "num_jobs"
         },
         {
           "type": "ARITH",
-          "dest": 9,
+          "dest": 18,
           "op": "+",
-          "src1": 18,
-          "src2": -3.200727873913003,
+          "src1": 3,
+          "src2": -0.9929255774806025,
           "src2_is_const": true
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 8,
+          "reg_name": 4,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 18,
-          "reg_weight": 14
+          "reg_name": 7,
+          "reg_weight": 7
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 19,
-          "reg_weight": 19
+          "reg_name": 12,
+          "reg_weight": 5
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH3",
-          "reg_name": 11,
-          "reg_weight": 8
+          "reg_name": 10,
+          "reg_weight": 6
         }
       ]
     },
@@ -1025,97 +876,146 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "+",
-          "src1": 4,
-          "src2": 5,
-          "src2_is_const": false
+          "type": "COPY_REG",
+          "dest": 11,
+          "src": 10
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 8,
+          "src": 8,
+          "maximum": 2.0
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 5,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 3,
-          "value": 4.520532285684933
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "+",
-          "src1": 18,
-          "src2": -0.10422909369983557,
-          "src2_is_const": true
+          "dest": 16,
+          "input_key": "num_jobs"
         },
         {
           "type": "ARITH",
           "dest": 16,
           "op": "/",
-          "src1": 13,
-          "src2": 15,
+          "src1": 15,
+          "src2": -2.5967606387578446,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 18,
+          "value": 4.481745495865708
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "*",
+          "src1": 7,
+          "src2": 7,
           "src2_is_const": false
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 14,
+          "value": 4.732604887595247
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 13,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 11,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 9,
+          "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
           "dest": 9,
           "op": "-",
-          "src1": 11,
-          "src2": 3.920063921974087,
+          "src1": 10,
+          "src2": 17,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 18,
+          "op": "*",
+          "src1": 8,
+          "src2": 4.766070228830568,
           "src2_is_const": true
         },
         {
           "type": "ARITH",
-          "dest": 3,
+          "dest": 7,
           "op": "*",
-          "src1": 7,
+          "src1": 8,
+          "src2": 1,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 7,
+          "value": 6.378696551059275
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 3,
+          "src": 3
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 15,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 5,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "/",
+          "src1": 6,
+          "src2": 0,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 6,
+          "value": 7.374683756237461
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "-",
+          "src1": 13,
           "src2": 11,
           "src2_is_const": false
         },
         {
           "type": "ARITH",
-          "dest": 15,
-          "op": "+",
-          "src1": 16,
-          "src2": -3.3297981273169066,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 15,
-          "value": 8.489007719388086
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 5,
-          "reg_weight": null
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH1",
-          "reg_name": 5,
-          "reg_weight": 8
+          "dest": 9,
+          "op": "*",
+          "src1": 9,
+          "src2": 2,
+          "src2_is_const": false
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 13,
-          "reg_weight": 10
+          "reg_name": 12,
+          "reg_weight": 5
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH3",
-          "reg_name": 13,
-          "reg_weight": 13
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 17,
-          "reg_weight": 15
+          "reg_name": 10,
+          "reg_weight": 6
         }
       ]
     },
@@ -2367,91 +2267,139 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "COPY_REG",
-          "dest": 13,
-          "src": 1
+          "type": "ARITH",
+          "dest": 11,
+          "op": "/",
+          "src1": 3,
+          "src2": -4.706437488271965,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 5,
+          "op": "+",
+          "src1": 8,
+          "src2": 0.7665167471418401,
+          "src2_is_const": true
         },
         {
           "type": "COND_SKIP",
-          "cond_reg": 16,
-          "threshold": 19.91120278430085,
+          "cond_reg": 9,
+          "threshold": 17.75545191954459,
           "skip_count": 3,
           "comparison": "<"
         },
         {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "*",
-          "src1": 9,
-          "src2": 1,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 14,
-          "op": "/",
-          "src1": 13,
-          "src2": 2.433077055196212,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "*",
-          "src1": 15,
-          "src2": -1.3265307304031806,
-          "src2_is_const": true
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 13,
-          "src": 13,
-          "minimum": 0.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 8,
-          "op": "+",
-          "src1": 17,
-          "src2": 3,
-          "src2_is_const": false
+          "type": "COPY_REG",
+          "dest": 5,
+          "src": 14
         },
         {
           "type": "ARITH",
           "dest": 12,
           "op": "-",
-          "src1": 9,
-          "src2": 13,
-          "src2_is_const": false
+          "src1": 14,
+          "src2": -3.5515166172193258,
+          "src2_is_const": true
         },
         {
           "type": "LOAD_CONST",
-          "dest": 14,
-          "value": 4.471296596702572
+          "dest": 13,
+          "value": 4.218164878433451
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "DR",
-          "reg_name": 14,
-          "reg_weight": null
+          "type": "COND_SKIP",
+          "cond_reg": 2,
+          "threshold": 43.84956190924874,
+          "skip_count": 2,
+          "comparison": "<"
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "*",
+          "src1": 0,
+          "src2": 9,
+          "src2_is_const": false
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 17,
+          "src": 7
+        },
+        {
+          "type": "ARITH",
+          "dest": 18,
+          "op": "-",
+          "src1": 6,
+          "src2": 0.46559242609755724,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "+",
+          "src1": 0,
+          "src2": 11,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 0,
+          "threshold": 37.94645766068393,
+          "skip_count": 2,
+          "comparison": "<"
+        },
+        {
+          "type": "ARITH",
+          "dest": 19,
+          "op": "-",
+          "src1": 7,
+          "src2": 1,
+          "src2_is_const": false
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 4,
+          "src": 2
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 16,
-          "reg_weight": 11
+          "reg_name": 5,
+          "reg_weight": 4
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 2,
+          "threshold": 29.038531368813292,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 15,
+          "reg_weight": null
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 16,
+          "threshold": 20.652840175050084,
+          "skip_count": 2,
+          "comparison": "<"
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 4,
-          "reg_weight": 5
+          "reg_name": 16,
+          "reg_weight": 7
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH3",
-          "reg_name": 15,
-          "reg_weight": 14
+          "reg_name": 10,
+          "reg_weight": 12
         }
       ]
     },
@@ -2653,94 +2601,137 @@
       "num_registers": 20,
       "instructions": [
         {
+          "type": "CLAMP_MAX",
+          "dest": 18,
+          "src": 18,
+          "maximum": 2.0
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 15,
+          "src": 15,
+          "maximum": 2.0
+        },
+        {
           "type": "ARITH",
-          "dest": 11,
-          "op": "+",
-          "src1": 6,
-          "src2": -0.8341321633675385,
+          "dest": 19,
+          "op": "-",
+          "src1": 8,
+          "src2": 18,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "*",
+          "src1": 15,
+          "src2": -4.67437352966702,
           "src2_is_const": true
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 17,
-          "input_key": "avg_processing_time"
+          "type": "ARITH",
+          "dest": 8,
+          "op": "/",
+          "src1": 14,
+          "src2": 1.982445680961396,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 3,
+          "op": "+",
+          "src1": 0,
+          "src2": -1.2057199641311014,
+          "src2_is_const": true
         },
         {
           "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 4.829448181754195
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 12,
-          "src": 12,
-          "minimum": 0.0
+          "dest": 18,
+          "value": 4.481745495865708
         },
         {
           "type": "ARITH",
-          "dest": 5,
-          "op": "/",
-          "src1": 1,
-          "src2": 13,
+          "dest": 12,
+          "op": "*",
+          "src1": 7,
+          "src2": 7,
           "src2_is_const": false
         },
         {
+          "type": "CLAMP_MIN",
+          "dest": 19,
+          "src": 19,
+          "minimum": 0.0
+        },
+        {
           "type": "LOAD_INPUT",
-          "dest": 10,
+          "dest": 13,
           "input_key": "avg_ops_per_job"
         },
         {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "*",
-          "src1": 11,
-          "src2": -3.692338484476135,
-          "src2_is_const": true
+          "type": "LOAD_INPUT",
+          "dest": 11,
+          "input_key": "avg_ops_per_job"
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 3,
+          "dest": 9,
           "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
-          "dest": 6,
-          "op": "+",
-          "src1": 8,
-          "src2": 4,
+          "dest": 9,
+          "op": "-",
+          "src1": 10,
+          "src2": 17,
           "src2_is_const": false
         },
         {
           "type": "ARITH",
-          "dest": 15,
+          "dest": 18,
           "op": "*",
-          "src1": 19,
-          "src2": 5,
+          "src1": 8,
+          "src2": 4.766070228830568,
+          "src2_is_const": true
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 6,
+          "threshold": 14.812323163257224,
+          "skip_count": 2,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 7,
+          "op": "*",
+          "src1": 8,
+          "src2": 1,
           "src2_is_const": false
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 13,
+          "reg_name": 5,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 9,
+          "reg_name": 5,
           "reg_weight": 8
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 18,
-          "reg_weight": 19
+          "reg_name": 13,
+          "reg_weight": 10
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH3",
-          "reg_name": 17,
-          "reg_weight": 18
+          "reg_name": 13,
+          "reg_weight": 13
         }
       ]
     },
@@ -4039,209 +4030,134 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "CLAMP_MIN",
-          "dest": 2,
-          "src": 2,
-          "minimum": 0.0
-        },
-        {
-          "type": "LOAD_INPUT",
+          "type": "ARITH",
           "dest": 17,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "*",
-          "src1": 14,
-          "src2": 15,
+          "op": "+",
+          "src1": 4,
+          "src2": 5,
           "src2_is_const": false
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 19,
+          "dest": 5,
           "input_key": "avg_processing_time"
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 11,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 19,
-          "src": 19,
-          "minimum": 0.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "*",
-          "src1": 19,
-          "src2": 1.7211008171698268,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "/",
-          "src1": 3,
-          "src2": 4,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 4,
-          "input_key": "avg_ops_per_job"
+          "type": "LOAD_CONST",
+          "dest": 3,
+          "value": 4.520532285684933
         },
         {
           "type": "ARITH",
           "dest": 8,
-          "op": "-",
-          "src1": 15,
-          "src2": 1.9343292652935524,
+          "op": "+",
+          "src1": 18,
+          "src2": -0.10422909369983557,
           "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 15,
-          "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
-          "dest": 13,
-          "op": "+",
-          "src1": 14,
-          "src2": 3.655222308564124,
+          "dest": 16,
+          "op": "/",
+          "src1": 13,
+          "src2": 15,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "-",
+          "src1": 11,
+          "src2": 3.920063921974087,
           "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 6,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 16,
-          "threshold": 32.65348803064594,
-          "skip_count": 2,
-          "comparison": "<"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 14,
-          "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
           "dest": 3,
-          "op": "-",
+          "op": "*",
           "src1": 7,
-          "src2": 8,
+          "src2": 11,
           "src2_is_const": false
         },
         {
+          "type": "ARITH",
+          "dest": 15,
+          "op": "+",
+          "src1": 16,
+          "src2": -3.3297981273169066,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "*",
+          "src1": 14,
+          "src2": 0.9636991861550239,
+          "src2_is_const": true
+        },
+        {
           "type": "LOAD_INPUT",
-          "dest": 5,
+          "dest": 4,
           "input_key": "avg_processing_time"
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 15,
+          "dest": 10,
           "input_key": "avg_ops_per_job"
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 18,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 14,
-          "op": "/",
-          "src1": 17,
-          "src2": -4.583894777297667,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 13,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 12,
-          "src": 7
-        },
-        {
-          "type": "CLAMP_MAX",
           "dest": 1,
-          "src": 1,
-          "maximum": 2.0
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 11,
           "input_key": "num_jobs"
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 3,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 14,
-          "op": "-",
-          "src1": 19,
-          "src2": -3.3401838230974077,
-          "src2_is_const": true
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 4,
-          "src": 6
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 17,
-          "input_key": "avg_processing_time"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 5,
-          "input_key": "avg_processing_time"
+          "type": "CLAMP_MIN",
+          "dest": 12,
+          "src": 12,
+          "minimum": 0.0
         },
         {
           "type": "COND_SKIP",
-          "cond_reg": 9,
-          "threshold": 14.46666217324718,
-          "skip_count": 2,
-          "comparison": ">"
+          "cond_reg": 18,
+          "threshold": 47.303101679505026,
+          "skip_count": 1,
+          "comparison": "<"
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 7,
+          "reg_name": 18,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 16,
+          "reg_name": 3,
+          "reg_weight": 14
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "DR",
+          "reg_name": 6,
+          "reg_weight": null
+        },
+        {
+          "type": "SET_PORTFOLIO",
+          "component": "MH1",
+          "reg_name": 3,
           "reg_weight": 4
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 11,
-          "reg_weight": 7
+          "reg_name": 6,
+          "reg_weight": 16
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH3",
-          "reg_name": 7,
-          "reg_weight": 10
+          "reg_name": 17,
+          "reg_weight": 15
         }
       ]
     },
@@ -4445,42 +4361,12 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "COPY_REG",
-          "dest": 11,
-          "src": 7
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 10,
-          "value": 5.533966317847301
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 7.789696525132599
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 2.0544571815244197
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 9,
-          "value": 7.478436409812495
-        },
-        {
           "type": "ARITH",
-          "dest": 4,
-          "op": "-",
-          "src1": 7,
-          "src2": 3,
+          "dest": 10,
+          "op": "/",
+          "src1": 8,
+          "src2": 14,
           "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 19,
-          "input_key": "num_jobs"
         },
         {
           "type": "LOAD_INPUT",
@@ -4488,98 +4374,195 @@
           "input_key": "avg_processing_time"
         },
         {
+          "type": "LOAD_CONST",
+          "dest": 3,
+          "value": 6.414227464816396
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 4,
+          "value": 7.008820313830021
+        },
+        {
+          "type": "ARITH",
+          "dest": 19,
+          "op": "+",
+          "src1": 3,
+          "src2": 9,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "/",
+          "src1": 12,
+          "src2": 0,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 4,
+          "src2": 2.9677043704304555,
+          "src2_is_const": true
+        },
+        {
           "type": "COND_SKIP",
           "cond_reg": 4,
-          "threshold": 19.341912441258874,
+          "threshold": 14.902825160804777,
+          "skip_count": 3,
+          "comparison": "<"
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 0,
+          "threshold": 27.676209388213945,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 3,
+          "op": "+",
+          "src1": 18,
+          "src2": 0.37152048554460926,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 14,
+          "op": "-",
+          "src1": 6,
+          "src2": 16,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "-",
+          "src1": 19,
+          "src2": -3.0567378465367456,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 4,
+          "value": 8.513877224254742
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 17,
+          "threshold": 23.063260184479695,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 5,
+          "op": "/",
+          "src1": 8,
+          "src2": 18,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 7,
+          "op": "/",
+          "src1": 19,
+          "src2": -4.987997941898633,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 11,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 16,
+          "value": 2.2948625637905016
+        },
+        {
+          "type": "CLAMP_MIN",
+          "dest": 12,
+          "src": 12,
+          "minimum": 0.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "-",
+          "src1": 13,
+          "src2": 15,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 2,
+          "threshold": 14.163333400447792,
           "skip_count": 3,
           "comparison": "<"
         },
         {
           "type": "ARITH",
-          "dest": 8,
+          "dest": 3,
           "op": "+",
-          "src1": 15,
-          "src2": 2.7036704922461388,
+          "src1": 0,
+          "src2": -3.8217139601884895,
           "src2_is_const": true
         },
         {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "-",
+          "src1": 10,
+          "src2": 3,
+          "src2_is_const": false
+        },
+        {
           "type": "LOAD_INPUT",
-          "dest": 0,
+          "dest": 18,
           "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
-          "dest": 4,
+          "dest": 16,
           "op": "/",
-          "src1": 12,
-          "src2": 1.2857069606057605,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 7,
-          "value": 2.7746773573456007
-        },
-        {
-          "type": "ARITH",
-          "dest": 19,
-          "op": "*",
-          "src1": 6,
-          "src2": -3.446228687734144,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 5,
-          "op": "-",
-          "src1": 9,
-          "src2": 2.2995837743154146,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 5,
-          "op": "+",
-          "src1": 13,
-          "src2": 19,
+          "src1": 18,
+          "src2": 8,
           "src2_is_const": false
         },
         {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 13
+        },
+        {
           "type": "ARITH",
-          "dest": 8,
-          "op": "+",
-          "src1": 3,
-          "src2": 4,
-          "src2_is_const": false
+          "dest": 18,
+          "op": "/",
+          "src1": 8,
+          "src2": 0.776511530902706,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 4,
+          "src": 4,
+          "maximum": 2.0
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 8,
+          "reg_name": 9,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 18,
-          "reg_weight": 14
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 19,
-          "reg_weight": 19
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
           "reg_name": 11,
-          "reg_weight": 8
+          "reg_weight": 5
         }
       ]
     },
@@ -5426,172 +5409,198 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "CLAMP_MAX",
-          "dest": 3,
-          "src": 3,
-          "maximum": 2.0
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 7,
-          "threshold": 6.7192760484220235,
-          "skip_count": 3,
-          "comparison": "<"
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 11,
-          "src": 10
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 5,
-          "src": 19
-        },
-        {
           "type": "ARITH",
-          "dest": 9,
-          "op": "*",
-          "src1": 13,
-          "src2": 2.5949329522625666,
-          "src2_is_const": true
-        },
-        {
-          "type": "CLAMP_MIN",
           "dest": 16,
-          "src": 16,
-          "minimum": 0.0
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 12,
-          "src": 2
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 7,
-          "src": 12
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 3,
-          "src": 16
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "+",
-          "src1": 1,
-          "src2": 14,
-          "src2_is_const": false
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 6,
-          "threshold": 13.698874923717947,
-          "skip_count": 2,
-          "comparison": "<"
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 6,
-          "value": 6.811743604433774
-        },
-        {
-          "type": "ARITH",
-          "dest": 18,
           "op": "*",
-          "src1": 19,
-          "src2": 15,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 11,
-          "op": "+",
-          "src1": 2,
-          "src2": 12,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "*",
-          "src1": 7,
-          "src2": 1.7769524609097074,
+          "src1": 11,
+          "src2": -4.416999755528349,
           "src2_is_const": true
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 19,
-          "value": 0.20052357499524387
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 18,
-          "src": 0
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 5,
-          "threshold": 30.05709752472669,
-          "skip_count": 1,
-          "comparison": ">"
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "*",
-          "src1": 8,
-          "src2": 12,
-          "src2_is_const": false
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 6,
+          "dest": 2,
           "input_key": "avg_processing_time"
         },
         {
           "type": "ARITH",
-          "dest": 19,
-          "op": "+",
-          "src1": 19,
-          "src2": 3,
+          "dest": 9,
+          "op": "/",
+          "src1": 16,
+          "src2": 7,
           "src2_is_const": false
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 11,
-          "input_key": "avg_ops_per_job"
+          "type": "ARITH",
+          "dest": 19,
+          "op": "/",
+          "src1": 7,
+          "src2": 4.475033445574185,
+          "src2_is_const": true
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 14,
+          "src": 18
         },
         {
           "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 2.9847592625329744
+          "dest": 9,
+          "value": 6.703351261430567
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 6,
+          "src": 13
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "/",
+          "src1": 2,
+          "src2": -3.462454227823545,
+          "src2_is_const": true
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 6,
+          "reg_name": 13,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 18,
+          "reg_name": 4,
           "reg_weight": 5
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 13,
-          "reg_weight": 11
+          "type": "COND_SKIP",
+          "cond_reg": 10,
+          "threshold": 27.50406711975596,
+          "skip_count": 2,
+          "comparison": "<"
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 13,
-          "reg_weight": 11
+          "type": "LOAD_INPUT",
+          "dest": 13,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 18,
+          "src2": -1.2493692513027632,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "+",
+          "src1": 14,
+          "src2": -4.998043721443915,
+          "src2_is_const": true
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 19,
+          "threshold": 0.8151223948632769,
+          "skip_count": 1,
+          "comparison": "<"
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 6,
+          "src2": -4.782986285424005,
+          "src2_is_const": true
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 16,
+          "threshold": 27.816154275338423,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 17,
+          "op": "*",
+          "src1": 11,
+          "src2": 8,
+          "src2_is_const": false
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 7,
+          "src": 7,
+          "maximum": 2.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
+          "op": "-",
+          "src1": 2,
+          "src2": 0.6906493692011981,
+          "src2_is_const": true
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 10
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "/",
+          "src1": 19,
+          "src2": -4.626284038216669,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 4,
+          "op": "/",
+          "src1": 10,
+          "src2": 13,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 3,
+          "threshold": 43.489325706060995,
+          "skip_count": 1,
+          "comparison": ">"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 15,
+          "value": 0.5412794876682303
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 10,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 10,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 7,
+          "value": 0.5051981414582751
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 17,
+          "src": 12
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 19,
+          "src": 18
         }
       ]
     },
@@ -5953,138 +5962,182 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "LOAD_INPUT",
-          "dest": 3,
-          "input_key": "num_jobs"
+          "type": "ARITH",
+          "dest": 6,
+          "op": "/",
+          "src1": 6,
+          "src2": 10,
+          "src2_is_const": false
         },
         {
-          "type": "CLAMP_MAX",
+          "type": "ARITH",
           "dest": 9,
-          "src": 9,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "+",
+          "op": "/",
           "src1": 13,
-          "src2": -4.050015296694197,
+          "src2": 1.1147805989176742,
           "src2_is_const": true
         },
         {
+          "type": "CLAMP_MAX",
+          "dest": 1,
+          "src": 1,
+          "maximum": 2.0
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 9,
+          "src": 16
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 15,
+          "input_key": "avg_ops_per_job"
+        },
+        {
           "type": "ARITH",
-          "dest": 7,
+          "dest": 8,
           "op": "*",
-          "src1": 5,
-          "src2": 14,
-          "src2_is_const": false
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 2,
-          "src": 2,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "/",
-          "src1": 5,
-          "src2": 12,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "-",
-          "src1": 15,
-          "src2": 1.4884648387226376,
+          "src1": 14,
+          "src2": -1.5767298231815383,
           "src2_is_const": true
         },
         {
-          "type": "ARITH",
-          "dest": 4,
-          "op": "/",
-          "src1": 5,
-          "src2": 18,
-          "src2_is_const": false
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 14,
-          "src": 14,
-          "minimum": 0.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "-",
-          "src1": 11,
-          "src2": 3.6257577452409357,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 15,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 14,
-          "src": 14,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
+          "type": "LOAD_CONST",
           "dest": 11,
-          "op": "-",
-          "src1": 10,
-          "src2": 16,
-          "src2_is_const": false
+          "value": 6.100765800787515
         },
         {
-          "type": "COND_SKIP",
-          "cond_reg": 10,
-          "threshold": 25.954983950817272,
-          "skip_count": 3,
-          "comparison": ">"
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 8,
+          "src2": -2.751329620071833,
+          "src2_is_const": true
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 6
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 7,
+          "dest": 11,
           "input_key": "avg_processing_time"
         },
         {
+          "type": "COPY_REG",
+          "dest": 7,
+          "src": 19
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 12,
+          "input_key": "avg_ops_per_job"
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 5,
+          "src": 10
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 17,
+          "src": 17
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 13,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 8,
+          "value": 9.738917312202949
+        },
+        {
           "type": "ARITH",
-          "dest": 15,
-          "op": "+",
-          "src1": 4,
-          "src2": 0.5834423670218793,
+          "dest": 13,
+          "op": "/",
+          "src1": 6,
+          "src2": 0.9097019904217483,
           "src2_is_const": true
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 3,
+          "reg_name": 13,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 8,
-          "reg_weight": 19
+          "reg_name": 10,
+          "reg_weight": 8
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH2",
-          "reg_name": 18,
+          "reg_name": 5,
           "reg_weight": 18
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 8,
-          "reg_weight": 5
+          "type": "LOAD_CONST",
+          "dest": 5,
+          "value": 6.522987304190796
+        },
+        {
+          "type": "ARITH",
+          "dest": 4,
+          "op": "+",
+          "src1": 5,
+          "src2": 5,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 12,
+          "threshold": 39.3980314937919,
+          "skip_count": 1,
+          "comparison": "<"
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 0,
+          "src": 0,
+          "maximum": 2.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "/",
+          "src1": 10,
+          "src2": 17,
+          "src2_is_const": false
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 4,
+          "src": 4,
+          "maximum": 2.0
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 14,
+          "src": 14,
+          "maximum": 2.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "*",
+          "src1": 10,
+          "src2": 14,
+          "src2_is_const": false
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 13,
+          "src": 0
         }
       ]
     },
@@ -7137,170 +7190,94 @@
       "num_registers": 20,
       "instructions": [
         {
-          "type": "ARITH",
-          "dest": 19,
-          "op": "-",
-          "src1": 9,
-          "src2": 19,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 4,
-          "value": 3.5973999827546344
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 8,
-          "value": 0.8684281257403748
-        },
-        {
-          "type": "ARITH",
+          "type": "LOAD_INPUT",
           "dest": 15,
-          "op": "-",
-          "src1": 11,
-          "src2": -0.9454903314947956,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 2,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 17,
           "input_key": "avg_ops_per_job"
         },
         {
           "type": "ARITH",
-          "dest": 11,
-          "op": "/",
-          "src1": 7,
-          "src2": -3.0547480691403894,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 8,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_INPUT",
           "dest": 3,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
           "op": "*",
-          "src1": 10,
-          "src2": 3.029422425723574,
-          "src2_is_const": true
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 18,
-          "src": 18,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "*",
-          "src1": 12,
-          "src2": 2.6996719273383354,
-          "src2_is_const": true
-        },
-        {
-          "type": "COND_SKIP",
-          "cond_reg": 14,
-          "threshold": 34.07973366257565,
-          "skip_count": 3,
-          "comparison": ">"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 8,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "*",
-          "src1": 7,
-          "src2": -0.8757402781065053,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 0,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 7,
-          "src": 7,
-          "minimum": 0.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 15,
-          "op": "/",
-          "src1": 10,
-          "src2": 5,
-          "src2_is_const": false
-        },
-        {
-          "type": "ARITH",
-          "dest": 9,
-          "op": "/",
-          "src1": 18,
-          "src2": 6,
-          "src2_is_const": false
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 10,
-          "src": 7
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 6,
-          "src": 6,
-          "maximum": 2.0
-        },
-        {
-          "type": "ARITH",
-          "dest": 10,
-          "op": "+",
-          "src1": 19,
+          "src1": 9,
           "src2": 3,
           "src2_is_const": false
         },
         {
+          "type": "LOAD_CONST",
+          "dest": 7,
+          "value": 4.188257517714256
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 16,
+          "src": 16,
+          "maximum": 2.0
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 12,
+          "src": 3
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "*",
+          "src1": 15,
+          "src2": 6,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 18,
+          "value": 3.580493746949883
+        },
+        {
+          "type": "CLAMP_MIN",
+          "dest": 6,
+          "src": 6,
+          "minimum": 0.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "/",
+          "src1": 9,
+          "src2": 17,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 15,
+          "threshold": 16.53018080983507,
+          "skip_count": 1,
+          "comparison": ">"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 6,
+          "value": 8.352321652632412
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 7,
+          "value": 9.494460157311162
+        },
+        {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 5,
+          "reg_name": 19,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 18,
-          "reg_weight": 3
+          "reg_name": 5,
+          "reg_weight": 6
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 4,
-          "reg_weight": 18
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 14,
-          "reg_weight": 13
+          "type": "LOAD_INPUT",
+          "dest": 14,
+          "input_key": "num_jobs"
         }
       ]
     },
@@ -7836,124 +7813,190 @@
       "num_registers": 20,
       "instructions": [
         {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "/",
+          "src1": 6,
+          "src2": 10,
+          "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "/",
+          "src1": 13,
+          "src2": 1.1147805989176742,
+          "src2_is_const": true
+        },
+        {
           "type": "CLAMP_MAX",
-          "dest": 15,
-          "src": 15,
+          "dest": 1,
+          "src": 1,
           "maximum": 2.0
         },
         {
           "type": "COPY_REG",
-          "dest": 12,
-          "src": 17
+          "dest": 9,
+          "src": 16
         },
         {
           "type": "LOAD_INPUT",
           "dest": 15,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 17,
-          "input_key": "avg_processing_time"
+          "input_key": "avg_ops_per_job"
         },
         {
           "type": "ARITH",
-          "dest": 17,
-          "op": "-",
+          "dest": 8,
+          "op": "*",
+          "src1": 14,
+          "src2": -1.5767298231815383,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 11,
+          "value": 6.100765800787515
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
           "src1": 8,
-          "src2": 0.9867994423563777,
+          "src2": -2.751329620071833,
+          "src2_is_const": true
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 6
+        },
+        {
+          "type": "ARITH",
+          "dest": 14,
+          "op": "*",
+          "src1": 17,
+          "src2": 2.9540535600233353,
           "src2_is_const": true
         },
         {
           "type": "ARITH",
-          "dest": 7,
+          "dest": 15,
+          "op": "-",
+          "src1": 12,
+          "src2": 4.546088633914614,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 12,
           "op": "*",
-          "src1": 14,
-          "src2": 8,
+          "src1": 2,
+          "src2": 14,
           "src2_is_const": false
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 16,
-          "input_key": "avg_processing_time"
+          "type": "COPY_REG",
+          "dest": 9,
+          "src": 6
         },
         {
-          "type": "COPY_REG",
+          "type": "CLAMP_MIN",
+          "dest": 8,
+          "src": 8,
+          "minimum": 0.0
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 8,
+          "threshold": 6.863647740046147,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 19,
+          "op": "/",
+          "src1": 7,
+          "src2": -4.475088931605372,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 5,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 12,
+          "value": 3.211677021191667
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 5,
+          "value": 6.522987304190796
+        },
+        {
+          "type": "ARITH",
+          "dest": 4,
+          "op": "+",
+          "src1": 5,
+          "src2": 5,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 12,
+          "threshold": 39.3980314937919,
+          "skip_count": 1,
+          "comparison": "<"
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 0,
+          "src": 0,
+          "maximum": 2.0
+        },
+        {
+          "type": "CLAMP_MAX",
+          "dest": 4,
+          "src": 4,
+          "maximum": 2.0
+        },
+        {
+          "type": "CLAMP_MAX",
           "dest": 14,
-          "src": 0
+          "src": 14,
+          "maximum": 2.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "*",
+          "src1": 10,
+          "src2": 14,
+          "src2_is_const": false
         },
         {
           "type": "COPY_REG",
           "dest": 13,
-          "src": 7
+          "src": 0
         },
         {
           "type": "COPY_REG",
-          "dest": 15,
-          "src": 17
-        },
-        {
-          "type": "ARITH",
-          "dest": 18,
-          "op": "*",
-          "src1": 17,
-          "src2": 9,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 10,
-          "input_key": "num_jobs"
-        },
-        {
-          "type": "ARITH",
-          "dest": 5,
-          "op": "+",
-          "src1": 1,
-          "src2": -3.702257336777539,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 18,
-          "op": "/",
-          "src1": 6,
-          "src2": 18,
-          "src2_is_const": false
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 19,
-          "value": 6.239704839983137
-        },
-        {
-          "type": "LOAD_INPUT",
-          "dest": 1,
-          "input_key": "avg_processing_time"
+          "dest": 9,
+          "src": 18
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 10,
+          "reg_name": 8,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 5,
-          "reg_weight": 3
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 9,
-          "reg_weight": 18
-        },
-        {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 5,
-          "reg_weight": 17
+          "reg_name": 15,
+          "reg_weight": 16
         }
       ]
     },
@@ -8613,166 +8656,204 @@
       "instructions": [
         {
           "type": "ARITH",
-          "dest": 3,
+          "dest": 10,
           "op": "/",
-          "src1": 5,
-          "src2": 6,
+          "src1": 8,
+          "src2": 14,
           "src2_is_const": false
         },
         {
-          "type": "ARITH",
-          "dest": 13,
-          "op": "+",
-          "src1": 5,
-          "src2": -3.764557831645665,
-          "src2_is_const": true
+          "type": "LOAD_INPUT",
+          "dest": 0,
+          "input_key": "avg_processing_time"
         },
         {
-          "type": "COPY_REG",
-          "dest": 5,
-          "src": 11
+          "type": "LOAD_CONST",
+          "dest": 3,
+          "value": 6.414227464816396
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 4,
+          "value": 7.008820313830021
+        },
+        {
+          "type": "ARITH",
+          "dest": 19,
+          "op": "+",
+          "src1": 3,
+          "src2": 9,
+          "src2_is_const": false
         },
         {
           "type": "LOAD_INPUT",
-          "dest": 12,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 8,
-          "src": 16
+          "dest": 5,
+          "input_key": "num_jobs"
         },
         {
           "type": "ARITH",
-          "dest": 15,
-          "op": "-",
-          "src1": 1,
-          "src2": 4.1225277882213245,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 7,
+          "dest": 10,
           "op": "*",
-          "src1": 5,
-          "src2": -4.486895097823316,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 17,
-          "op": "-",
-          "src1": 9,
-          "src2": -3.8244602159752015,
+          "src1": 4,
+          "src2": 2.9677043704304555,
           "src2_is_const": true
         },
         {
           "type": "COND_SKIP",
+          "cond_reg": 4,
+          "threshold": 14.902825160804777,
+          "skip_count": 3,
+          "comparison": "<"
+        },
+        {
+          "type": "COND_SKIP",
           "cond_reg": 0,
-          "threshold": 31.12801639936708,
-          "skip_count": 2,
+          "threshold": 27.676209388213945,
+          "skip_count": 3,
           "comparison": ">"
         },
         {
-          "type": "LOAD_INPUT",
-          "dest": 15,
-          "input_key": "avg_ops_per_job"
-        },
-        {
-          "type": "CLAMP_MIN",
-          "dest": 19,
-          "src": 19,
-          "minimum": 0.0
-        },
-        {
-          "type": "CLAMP_MAX",
-          "dest": 7,
-          "src": 7,
-          "maximum": 2.0
+          "type": "ARITH",
+          "dest": 3,
+          "op": "+",
+          "src1": 18,
+          "src2": 0.37152048554460926,
+          "src2_is_const": true
         },
         {
           "type": "ARITH",
-          "dest": 18,
-          "op": "+",
-          "src1": 14,
-          "src2": 2,
+          "dest": 14,
+          "op": "-",
+          "src1": 6,
+          "src2": 16,
           "src2_is_const": false
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "-",
+          "src1": 19,
+          "src2": -3.0567378465367456,
+          "src2_is_const": true
+        },
+        {
+          "type": "LOAD_CONST",
+          "dest": 4,
+          "value": 8.513877224254742
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 17,
+          "threshold": 23.063260184479695,
+          "skip_count": 3,
+          "comparison": ">"
+        },
+        {
+          "type": "ARITH",
+          "dest": 8,
+          "op": "+",
+          "src1": 4,
+          "src2": 1,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 9,
+          "input_key": "num_jobs"
+        },
+        {
+          "type": "ARITH",
+          "dest": 10,
+          "op": "*",
+          "src1": 11,
+          "src2": 0.1889779340420592,
+          "src2_is_const": true
+        },
+        {
+          "type": "CLAMP_MIN",
+          "dest": 8,
+          "src": 8,
+          "minimum": 0.0
         },
         {
           "type": "ARITH",
           "dest": 11,
-          "op": "-",
-          "src1": 19,
-          "src2": 3.2012139130571864,
-          "src2_is_const": true
-        },
-        {
-          "type": "ARITH",
-          "dest": 7,
           "op": "+",
-          "src1": 1,
-          "src2": -4.6327894817758795,
+          "src1": 4,
+          "src2": 1.1442827830819802,
           "src2_is_const": true
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 12,
-          "value": 3.3111108780193845
-        },
-        {
-          "type": "ARITH",
-          "dest": 6,
-          "op": "*",
-          "src1": 13,
-          "src2": -3.3866477256945906,
-          "src2_is_const": true
-        },
-        {
-          "type": "LOAD_CONST",
-          "dest": 8,
-          "value": 9.662932638476626
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 4,
-          "src": 11
-        },
-        {
-          "type": "ARITH",
-          "dest": 12,
-          "op": "+",
-          "src1": 10,
-          "src2": 12,
-          "src2_is_const": false
-        },
-        {
-          "type": "COPY_REG",
-          "dest": 5,
-          "src": 17
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "DR",
-          "reg_name": 12,
+          "reg_name": 19,
           "reg_weight": null
         },
         {
           "type": "SET_PORTFOLIO",
           "component": "MH1",
-          "reg_name": 18,
+          "reg_name": 8,
           "reg_weight": 7
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH2",
-          "reg_name": 6,
-          "reg_weight": 11
+          "type": "LOAD_CONST",
+          "dest": 16,
+          "value": 2.2948625637905016
         },
         {
-          "type": "SET_PORTFOLIO",
-          "component": "MH3",
-          "reg_name": 13,
-          "reg_weight": 19
+          "type": "CLAMP_MIN",
+          "dest": 12,
+          "src": 12,
+          "minimum": 0.0
+        },
+        {
+          "type": "ARITH",
+          "dest": 6,
+          "op": "-",
+          "src1": 13,
+          "src2": 15,
+          "src2_is_const": false
+        },
+        {
+          "type": "COND_SKIP",
+          "cond_reg": 2,
+          "threshold": 14.163333400447792,
+          "skip_count": 3,
+          "comparison": "<"
+        },
+        {
+          "type": "ARITH",
+          "dest": 3,
+          "op": "+",
+          "src1": 0,
+          "src2": -3.8217139601884895,
+          "src2_is_const": true
+        },
+        {
+          "type": "ARITH",
+          "dest": 9,
+          "op": "-",
+          "src1": 10,
+          "src2": 3,
+          "src2_is_const": false
+        },
+        {
+          "type": "LOAD_INPUT",
+          "dest": 18,
+          "input_key": "avg_processing_time"
+        },
+        {
+          "type": "ARITH",
+          "dest": 16,
+          "op": "/",
+          "src1": 18,
+          "src2": 8,
+          "src2_is_const": false
+        },
+        {
+          "type": "COPY_REG",
+          "dest": 18,
+          "src": 13
         }
       ]
     },
