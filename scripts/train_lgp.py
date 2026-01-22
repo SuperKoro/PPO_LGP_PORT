@@ -11,8 +11,17 @@ import numpy as np
 import torch
 import torch.optim as optim
 
-# Add parent directory to path for imports
+# Workaround: OpenCV (cv2) tries to execute any config.py found on sys.path.
+# If run from project root, it may pick up this project's config.py via gym import.
 current_dir = os.path.dirname(os.path.abspath(__file__))
+orig_cwd = os.getcwd()
+try:
+    os.chdir(current_dir)
+    import gym  # Preload to avoid cv2 reading project config.py
+finally:
+    os.chdir(orig_cwd)
+
+# Add parent directory to path for imports
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
@@ -157,7 +166,6 @@ def main():
     print(f"\n" + "=" * 70)
     print("🚀 STARTING TRAINING")
     print("=" * 70)
-8    
     lgp_programs, final_action_library = train_with_coevolution_lgp(
         env=env,
         lgp_programs=lgp_programs,
