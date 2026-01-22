@@ -47,8 +47,9 @@ class PPOConfig:
     # Entropy coefficient for exploration
     # Safe to tune: 0.001 - 0.05
     # NOTE: With 64 discrete actions, higher entropy helps exploration
-    # Strategy A: Moderate entropy for balance between exploration and exploitation
-    entropy_coef = 0.2  # Reduced from 0.3 - balanced exploration/exploitation
+    # ⭐ FIX 3: REDUCE entropy for exploitation (was TOO HIGH at 0.5!)
+    # Lower entropy = less random exploration = focus on best programs
+    entropy_coef = 0.1  # Reduced from 0.5 - PPO must exploit best programs!
     
     # Generalized Advantage Estimation lambda (⚠️ CAREFUL)
     # Recommended: 0.9 - 0.99
@@ -64,30 +65,34 @@ class CoevolutionConfig:
     
     # Number of generations (Safe to modify)
     # Training time scales linearly with this
-    num_generations = 20  # Full training
+    num_generations = 20  # Full training with all fixes
     
     # Episodes per generation (Safe to modify)
     # More episodes = better fitness estimate but slower
     # Strategy A: Moderate increase for good coverage without excessive training time
-    episodes_per_gen = 400  # Full training
+    episodes_per_gen = 600  # Full training
     
     # Maximum steps per episode (⚠️ 
     # Too low: episodes end prematurely
     # Too high: wasted computation
     max_steps_per_episode = 200
     
+    # ⭐ FIX 1: Fixed Evaluation Seeds for Reproducibility
+    # Use fixed seeds to reduce variance and make fitness estimates reliable
+    use_fixed_eval_seeds = True  # Enable deterministic evaluation
+    eval_seed_start = 42  # Starting seed (will use 42, 43, 44, ...)
+    
     # ⛔ CRITICAL PARAMETERS - DO NOT CHANGE WITHOUT GOOD REASON ⛔
     
     # Number of elite portfolios to keep (⚠️ CRITICAL)
     # MUST be < pool_size and > n_replace
     # Recommended: 20-30% of pool_size
-    # Strategy A: Adjusted for pool_size=64
-    elite_size = 16  # 25% of pool_size
+    elite_size = 16  # 25% of pool_size - balance protection & evolution
     
     # Number of portfolios to replace each generation (⚠️ CRITICAL)
     # MUST be < elite_size
     # Recommended: 5-10% of pool_size
-    n_replace = 6  # ~10% of pool_size
+    n_replace = 8  # ~12% of pool_size - more new programs each gen
     
     # Warmup episodes before starting evolution
     # Safe to modify: 1-5
@@ -101,6 +106,15 @@ class CoevolutionConfig:
     
     # Probability to mutate MH name (Safe to tune: 0.1 - 0.3)
     mh_name_mutation_prob = 0.2
+    
+    # Hall of Fame size (protects best programs across all generations)
+    # Safe to tune: 5-15
+    hall_of_fame_size = 10
+    
+    # Learning rate decay parameters
+    # After each generation, LR = initial_lr * (lr_decay_factor ^ gen)
+    lr_decay_factor = 0.95  # Safe to tune: 0.9 - 1.0
+    lr_min = 5e-5  # Minimum learning rate floor
 
 
 # ============================================================================
@@ -139,7 +153,7 @@ class LGPConfig:
     num_registers = 20
     min_program_length = 8
     max_program_length = 30
-    mutation_rate = 0.5  # Increased from 0.3 for better exploration
+    mutation_rate = 0.3  # Reduced from 0.5 - less destructive mutations
 
 
 # ============================================================================
@@ -149,17 +163,37 @@ class LGPConfig:
 class EnvironmentConfig:
     """Job Shop Scheduling Environment settings"""
     
-    # Lambda for tardiness penalty (Safe to tune: 0.5 - 2.0)
-    lambda_tardiness = 1.0
+    # Dataset selection (Safe to modify)
+    # Options: None (default hardcoded), "Set20", "Set25", "Set30", "Set35", "Set40", "Set45", "Set50"
+    # Set to None to use hardcoded default data (20 jobs)
+    # Set to dataset name to load from data/ directory
+    dataset_name = "Set20"  # Change to "Set20", "Set25", etc. to use different datasets
     
     # Number of dynamic jobs per episode (⚠️ CAREFUL)
     # Affects episode difficulty
     # Recommended: 2-4
-    num_dynamic_jobs = 2
+    num_dynamic_jobs = 4
     
-    # Observation space size (⚠️ CRITICAL - DO NOT CHANGE)
+    # Observation space size (⚠️ CRITICAL - DO NOT CHANGE without updating env)
     # ⛔ Changing this requires model architecture changes!
-    obs_dim = 3  # [current_time, num_unfinished, avg_processing_time]
+    # 10D: [current_time, num_ops, avg_pt, min_slack, max_slack, urgent_ratio, total_pt, num_jobs, avg_due_date, machine_load_std]
+    obs_dim = 10
+    
+    # =========================================================================
+    # REWARD FUNCTION PARAMETERS
+    # =========================================================================
+    # Reward = -(alpha * makespan + (1-alpha) * (tardiness_normal + beta * tardiness_urgent))
+    
+    # Alpha: weight for makespan vs tardiness
+    # Higher alpha = focus more on makespan
+    # Lower alpha = focus more on reducing tardiness
+    # Safe to tune: 0.3 - 0.8
+    reward_alpha = 0.6
+    
+    # Beta: penalty multiplier for urgent jobs
+    # Higher beta = urgent jobs get more priority
+    # Safe to tune: 1.0 - 5.0
+    reward_beta = 2.0
 
 
 # ============================================================================
@@ -247,6 +281,9 @@ def print_config_summary():
     print(f"  Elite Size:        {CoevolutionConfig.elite_size}")
     print(f"  Replace Count:     {CoevolutionConfig.n_replace}")
     print(f"  Mutation Sigma:    {CoevolutionConfig.mutation_sigma}")
+    print(f"  Hall of Fame Size: {CoevolutionConfig.hall_of_fame_size}")
+    print(f"  LR Decay Factor:   {CoevolutionConfig.lr_decay_factor}")
+    print(f"  LR Minimum:        {CoevolutionConfig.lr_min}")
     
     print("\n📦 LGP Configuration:")
     print(f"  Pool Size:         {LGPConfig.pool_size}")
@@ -256,8 +293,10 @@ def print_config_summary():
     print(f"  Available MH:      {', '.join(LGPConfig.available_mh)}")
     
     print("\n🏭 Environment Configuration:")
+    print(f"  Dataset:           {EnvironmentConfig.dataset_name or 'Default (hardcoded)'}")
     print(f"  Dynamic Jobs:      {EnvironmentConfig.num_dynamic_jobs}")
-    print(f"  Lambda Tardiness:  {EnvironmentConfig.lambda_tardiness}")
+    print(f"  Reward Alpha:      {EnvironmentConfig.reward_alpha}")
+    print(f"  Reward Beta:       {EnvironmentConfig.reward_beta}")
     
     print("\n🎯 Experiment Settings:")
     print(f"  Random Seed:       {RANDOM_SEED}")

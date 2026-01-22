@@ -8,7 +8,7 @@ import copy
 import numpy as np
 import torch
 
-from config import LGPConfig
+from config import LGPConfig, CoevolutionConfig, PPOConfig, EnvironmentConfig
 from core.lgp_program import LGPProgram
 from core.lgp_generator import LGPGenerator
 from core.lgp_evolution import linear_crossover, mutate_program
@@ -23,7 +23,7 @@ class HallOfFame:
     Keeps track of best-ever programs across all generations.
     These programs are NEVER replaced during LGP evolution.
     """
-    def __init__(self, max_size: int = 5):
+    def __init__(self, max_size: int = 10):  # ⭐ FIX 4: Increased from 5 to 10
         self.max_size = max_size
         self.entries = []  # List of (fitness, program_copy, generation, original_idx)
     
@@ -109,27 +109,6 @@ class HallOfFame:
             print(f"      #{i+1}: fitness={fitness:.2f} (Gen {gen}, idx={idx})")
 
 
-# CoevolutionConfig definition
-from dataclasses import dataclass
-
-@dataclass
-class CoevolutionConfig:
-    """Configuration for coevolution training."""
-    num_generations: int = 20
-    episodes_per_gen: int = 10
-    max_steps_per_episode: int = 200
-    gamma: float = 0.9
-    ppo_epochs: int = 4
-    clip_epsilon: float = 0.2
-    entropy_coef: float = 0.01
-    elite_size: int = 16
-    n_replace: int = 4
-    warmup_episodes: int = 2
-    mutation_sigma: float = 0.3
-    dr_mutation_prob: float = 0.1
-    mh_name_mutation_prob: float = 0.2
-
-
 # Helper functions for metrics collection
 def collect_episode_metrics(env):
     """Collect metrics from environment after episode."""
@@ -212,42 +191,59 @@ def _select_elite_indices(fitness: np.ndarray, elite_size: int):
 
 def build_lgp_inputs_for_env(env) -> Dict[str, float]:
     """
-    Xây macro-state cho LGP.
-    Có thể chỉnh lại tuỳ dạng dữ liệu jobs của bạn.
+    Build macro-state inputs for LGP programs.
+    Enhanced to match the 10D observation space.
     """
-    num_jobs = 0
+    from environment.env_utils import split_schedule_list
+    
+    current_time = getattr(env, 'current_time', 0)
+    all_jobs_info = getattr(env, 'all_jobs_info', {})
+    schedule_events = getattr(env, 'current_schedule_events', [])
+    
+    # Get unfinished jobs info
+    if schedule_events and all_jobs_info:
+        _, unfinished_jobs = split_schedule_list(schedule_events, current_time, all_jobs_info)
+    else:
+        unfinished_jobs = {}
+    
+    # Basic features
+    num_jobs = len(unfinished_jobs)
     total_pt = 0.0
     total_ops = 0
-
-    jobs = getattr(env, "jobs_initial", None)
-    if isinstance(jobs, dict):
-        num_jobs = len(jobs)
-        for job_id, job_info in jobs.items():
-            ops = job_info.get("operations") if isinstance(job_info, dict) else job_info
-            if ops is None:
-                continue
-            for op in ops:
-                pt = op.get("processing_time", 0.0) if isinstance(op, dict) else 0.0
-                total_pt += float(pt)
-                total_ops += 1
-    elif isinstance(jobs, list):
-        num_jobs = len(jobs)
-        for job in jobs:
-            ops = job.get("operations") if isinstance(job, dict) else None
-            if ops is None:
-                continue
-            for op in ops:
-                pt = op.get("processing_time", 0.0) if isinstance(op, dict) else 0.0
-                total_pt += float(pt)
-                total_ops += 1
-
+    slacks = []
+    urgent_count = 0
+    due_dates = []
+    
+    for job, info in unfinished_jobs.items():
+        remaining_pt = sum(op.get('processing_time', 0) for op in info.get('operations', []))
+        total_pt += remaining_pt
+        total_ops += len(info.get('operations', []))
+        
+        due_date = info.get('due_date', current_time + 100)
+        slack = due_date - current_time - remaining_pt
+        slacks.append(slack)
+        due_dates.append(due_date)
+        
+        if info.get('job_type', 'Normal') == 'Urgent':
+            urgent_count += 1
+    
     avg_pt = total_pt / total_ops if total_ops > 0 else 0.0
     avg_ops_per_job = total_ops / num_jobs if num_jobs > 0 else 0.0
-
+    min_slack = min(slacks) if slacks else 0.0
+    max_slack = max(slacks) if slacks else 0.0
+    avg_due_date = sum(due_dates) / len(due_dates) if due_dates else current_time
+    urgent_ratio = urgent_count / num_jobs if num_jobs > 0 else 0.0
+    
     return {
         "num_jobs": float(num_jobs),
         "avg_processing_time": float(avg_pt),
         "avg_ops_per_job": float(avg_ops_per_job),
+        "total_processing_time": float(total_pt),
+        "min_slack": float(min_slack),
+        "max_slack": float(max_slack),
+        "urgent_ratio": float(urgent_ratio),
+        "avg_due_date": float(avg_due_date),
+        "current_time": float(current_time),
     }
 
 
@@ -296,15 +292,15 @@ def train_with_coevolution_lgp(
     # ===================================================================
     # FIX 1: Initialize Hall of Fame
     # ===================================================================
-    hall_of_fame = HallOfFame(max_size=5)
-    print("  📜 Hall of Fame initialized (max_size=5)")
+    hall_of_fame = HallOfFame(max_size=CoevolutionConfig.hall_of_fame_size)
+    print(f"  📜 Hall of Fame initialized (max_size={CoevolutionConfig.hall_of_fame_size})")
     
     # ===================================================================
     # FIX 3: Learning Rate Decay with MINIMUM FLOOR
     # ===================================================================
     initial_lr = optimizer.param_groups[0]['lr']
-    min_lr = 5e-5  # NEVER go below this!
-    decay_factor = 0.95
+    min_lr = CoevolutionConfig.lr_min
+    decay_factor = CoevolutionConfig.lr_decay_factor
     
     for gen in range(cfg.num_generations):
         print(f"\n========== LGP Generation {gen+1}/{cfg.num_generations} ==========")
@@ -350,6 +346,14 @@ def train_with_coevolution_lgp(
 
         # 2) PPO training trong generation này
         for ep in range(cfg.episodes_per_gen):
+            # ⭐ FIX 1: Use fixed seed for reproducible evaluation
+            if CoevolutionConfig.use_fixed_eval_seeds:
+                seed = CoevolutionConfig.eval_seed_start + ep
+                env.seed(seed)
+                random.seed(seed)
+                np.random.seed(seed)
+                torch.manual_seed(seed)  # Also set torch seed for action selection!
+            
             state = env.reset()
 
             # Separate lists for forced vs policy actions
@@ -418,7 +422,7 @@ def train_with_coevolution_lgp(
                     masks_policy = [masks[i] for i in policy_indices]
                     
                     # PPO update on policy actions only
-                    returns = compute_returns_fn(rewards_policy, masks_policy, gamma=cfg.gamma)
+                    returns = compute_returns_fn(rewards_policy, masks_policy, gamma=PPOConfig.gamma)
                     returns_t = torch.tensor(returns, dtype=torch.float32)
                     values_t = torch.stack(values_policy)
                     log_probs_old = torch.stack(log_probs_policy).detach()
@@ -431,7 +435,7 @@ def train_with_coevolution_lgp(
                         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
                     value_coef = 0.5
-                    for _ in range(cfg.ppo_epochs):
+                    for _ in range(PPOConfig.ppo_epochs):
                         logits, values = model(states_t)
                         dist = torch.distributions.Categorical(logits=logits)
                         log_probs = dist.log_prob(actions_t)
@@ -440,15 +444,15 @@ def train_with_coevolution_lgp(
                         surr1 = ratio * advantages
                         surr2 = torch.clamp(
                             ratio,
-                            1.0 - cfg.clip_epsilon,
-                            1.0 + cfg.clip_epsilon,
+                            1.0 - PPOConfig.clip_epsilon,
+                            1.0 + PPOConfig.clip_epsilon,
                         ) * advantages
                         policy_loss = -torch.min(surr1, surr2).mean()
 
                         value_loss = (returns_t - values.squeeze(-1)).pow(2).mean()
                         entropy = dist.entropy().mean()
 
-                        loss = policy_loss + value_coef * value_loss - cfg.entropy_coef * entropy
+                        loss = policy_loss + value_coef * value_loss - PPOConfig.entropy_coef * entropy
 
                         optimizer.zero_grad()
                         loss.backward()
@@ -478,10 +482,21 @@ def train_with_coevolution_lgp(
                 print(f"[Gen {gen+1} Ep {ep+1}] Return={ep_return:.2f} | PolicyLoss={avg_pl:.4f} | ValueLoss={avg_vl:.4f}{forced_info}")
 
         # 3) Fitness cho mỗi program
+        # ⭐ FIX: Don't penalize untested programs with -1e9!
+        # Instead, give them AVERAGE fitness of tested programs (neutral estimate)
         avg_reward = np.full(K, -1e9, dtype=np.float32)
         for i in range(K):
             if usage[i] > 0:
                 avg_reward[i] = sum_reward[i] / max(1, usage[i])
+        
+        # Calculate average fitness of TESTED programs only
+        tested_fitness = [avg_reward[i] for i in range(K) if usage[i] > 0]
+        if tested_fitness:
+            avg_tested_fitness = np.mean(tested_fitness)
+            # Give untested programs average fitness (neutral, not penalty!)
+            for i in range(K):
+                if usage[i] == 0:
+                    avg_reward[i] = avg_tested_fitness
 
         # 4) Evolve LGP programs
         elite_indices = _select_elite_indices(avg_reward, cfg.elite_size)

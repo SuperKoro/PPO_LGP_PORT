@@ -16,7 +16,12 @@ machine_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15]
 def simulated_annealing(jobs, due_dates, lambda_tardiness=1.0, **kwargs):
     """Dummy simulated_annealing: tạo lịch trình ban đầu dưới dạng dictionary."""
     # Khởi tạo thời gian sẵn sàng của các máy
-    machine_ready = {m: 0 for m in machine_pool}
+    # Extract all unique machines from jobs' candidate_machines
+    all_machines = set()
+    for job, ops in jobs.items():
+        for op in ops:
+            all_machines.update(op['candidate_machines'])
+    machine_ready = {m: 0 for m in all_machines}
     schedule = {}
     # Với mỗi job, duyệt các operation theo thứ tự
     for job, ops in jobs.items():

@@ -36,7 +36,7 @@ import registries.metaheuristics_impl
 
 # Import training components
 from training.ppo_model import PPOActorCritic, select_action, compute_returns
-from training.lgp_coevolution_trainer import train_with_coevolution_lgp, CoevolutionConfig as CoevoCfg
+from training.lgp_coevolution_trainer import train_with_coevolution_lgp
 from training.portfolio_types import ActionIndividual, Gene
 from environment.scheduling_env import DynamicSchedulingEnv
 
@@ -120,9 +120,10 @@ def main():
     # Initialize environment WITH CORRECT ACTION LIBRARY SIZE
     print(f"\n🏭 Creating scheduling environment...")
     env = DynamicSchedulingEnv(
-        lambda_tardiness=EnvironmentConfig.lambda_tardiness,
+        lambda_tardiness=1.0,  # Used for initial schedule creation only
         action_library=dummy_action_library,  # FIX: Pass dummy library with correct size!
-        action_budget_s=LGPConfig.action_budget_s
+        action_budget_s=LGPConfig.action_budget_s,
+        dataset_name=EnvironmentConfig.dataset_name  # Load dataset from config
     )
     obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.n  # Now act_dim = pool_size = 64
@@ -139,24 +140,9 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=PPOConfig.learning_rate)
     print(f"✓ PPO model created with lr={PPOConfig.learning_rate}")
     
-    # Configure coevolution
+    # Configure coevolution - use CoevolutionConfig directly
     print(f"\n⚙️  Configuring coevolution...")
-    cfg = CoevoCfg(
-        num_generations=CoevolutionConfig.num_generations,
-        episodes_per_gen=CoevolutionConfig.episodes_per_gen,
-        max_steps_per_episode=CoevolutionConfig.max_steps_per_episode,
-        gamma=PPOConfig.gamma,
-        ppo_epochs=PPOConfig.ppo_epochs,
-        clip_epsilon=PPOConfig.clip_epsilon,
-        entropy_coef=PPOConfig.entropy_coef,
-        elite_size=CoevolutionConfig.elite_size,
-        n_replace=CoevolutionConfig.n_replace,
-        warmup_episodes=CoevolutionConfig.warmup_episodes,
-        mutation_sigma=CoevolutionConfig.mutation_sigma,
-        dr_mutation_prob=CoevolutionConfig.dr_mutation_prob,
-        mh_name_mutation_prob=CoevolutionConfig.mh_name_mutation_prob
-    )
-    print(f"✓ Configuration: {cfg.num_generations} generations, {cfg.episodes_per_gen} episodes/gen")
+    print(f"✓ Configuration: {CoevolutionConfig.num_generations} generations, {CoevolutionConfig.episodes_per_gen} episodes/gen")
     
     # Create output directory
     output_dir = "results"
@@ -171,7 +157,7 @@ def main():
     print(f"\n" + "=" * 70)
     print("🚀 STARTING TRAINING")
     print("=" * 70)
-    
+8    
     lgp_programs, final_action_library = train_with_coevolution_lgp(
         env=env,
         lgp_programs=lgp_programs,
@@ -179,7 +165,7 @@ def main():
         optimizer=optimizer,
         select_action_fn=select_action,
         compute_returns_fn=compute_returns,
-        cfg=cfg,
+        cfg=CoevolutionConfig,  # Use config class directly
         output_dir=output_dir
     )
     

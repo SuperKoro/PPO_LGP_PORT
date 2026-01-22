@@ -33,13 +33,15 @@ class PPOActorCritic(nn.Module):
         return logits, value
 
 
-def select_action(model, state):
+def select_action(model, state, deterministic=False):
     """
     Select action using policy network.
     
     Args:
         model: PPOActorCritic network
         state: Current state observation
+        deterministic: If True, select action with highest probability (for evaluation)
+                      If False, sample from distribution (for training)
         
     Returns:
         action: Selected action index
@@ -50,7 +52,14 @@ def select_action(model, state):
     logits, value = model(state_tensor)
     probs = torch.softmax(logits, dim=-1)
     dist = torch.distributions.Categorical(probs)
-    action = dist.sample()
+    
+    if deterministic:
+        # ⭐ FIX: For evaluation, use argmax (no randomness)
+        action = probs.argmax(dim=-1)
+    else:
+        # For training, sample from distribution (allows exploration)
+        action = dist.sample()
+    
     return action.item(), dist.log_prob(action), value
 
 
