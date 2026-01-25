@@ -83,16 +83,16 @@ class DQN:
             target = reward
             target1 = reward
             if not done:
-                output = self.target_model.predict(next_state)
+                output = self.target_model.predict(next_state, verbose=0)
                 k = np.max(output)
                 target = (reward + self.gama * np.argmax(output))
                 next_state1 = np.expand_dims(np.append(next_state[0],k), 0)
                 target1 = (reward + self.gama *
-                          np.argmax(self.target_model1.predict(next_state1)))
-            target_f = self.model.predict(state)
+                          np.argmax(self.target_model1.predict(next_state1, verbose=0)))
+            target_f = self.model.predict(state, verbose=0)
             k = np.max(target_f)
             state1 = np.expand_dims(np.append(state[0],k),0)
-            target_f1 = self.model1.predict(state1)
+            target_f1 = self.model1.predict(state1, verbose=0)
             target_f[0][reward_id] = target
             target_f1[0][action] = target1
             self.model.fit(state, target_f, epochs=1, verbose=0)
@@ -105,10 +105,10 @@ class DQN:
             rt=random.randint(0,1)
             act=random.randint(0,8)
         else:
-            output=self.model.predict(obs)
+            output=self.model.predict(obs, verbose=0)
             rt=np.argmax(output)
             input = np.expand_dims(np.append(obs[0], np.argmax(output)),0)
-            act=np.argmax(self.model1.predict(input))
+            act=np.argmax(self.model1.predict(input, verbose=0))
         self.e_greedy = max(
             0.01, self.e_greedy - self.e_greedy_decrement)
         return act,rt

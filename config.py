@@ -167,12 +167,12 @@ class EnvironmentConfig:
     # Options: None (default hardcoded), "Set20", "Set25", "Set30", "Set35", "Set40", "Set45", "Set50"
     # Set to None to use hardcoded default data (20 jobs)
     # Set to dataset name to load from data/ directory
-    dataset_name = "Set20"  # Change to "Set20", "Set25", etc. to use different datasets
+    dataset_name = "Ref_M8_E50_N20"  # Ref dataset generator: M=8, E_ave=50, New_insert=20
     
     # Number of dynamic jobs per episode (⚠️ CAREFUL)
     # Affects episode difficulty
     # Recommended: 2-4
-    num_dynamic_jobs = 4
+    num_dynamic_jobs = 20
     
     # Observation space size (⚠️ CRITICAL - DO NOT CHANGE without updating env)
     # ⛔ Changing this requires model architecture changes!

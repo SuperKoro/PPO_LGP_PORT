@@ -104,7 +104,7 @@ class HallOfFame:
     
     def print_status(self):
         """Print current Hall of Fame status."""
-        print(f"  📜 Hall of Fame ({len(self.entries)}/{self.max_size}):")
+        print(f"  Hall of Fame ({len(self.entries)}/{self.max_size}):")
         for i, (fitness, prog, gen, idx) in enumerate(self.entries):
             print(f"      #{i+1}: fitness={fitness:.2f} (Gen {gen}, idx={idx})")
 
@@ -279,6 +279,8 @@ def train_with_coevolution_lgp(
     K = len(lgp_programs)
     assert K == LGPConfig.pool_size, "Pool size must match number of LGP programs"
 
+    device = next(model.parameters()).device
+
     rng_np = np.random.default_rng(seed=0)
     rng_py = random.Random(0)
 
@@ -293,7 +295,7 @@ def train_with_coevolution_lgp(
     # FIX 1: Initialize Hall of Fame
     # ===================================================================
     hall_of_fame = HallOfFame(max_size=CoevolutionConfig.hall_of_fame_size)
-    print(f"  📜 Hall of Fame initialized (max_size={CoevolutionConfig.hall_of_fame_size})")
+    print(f"  Hall of Fame initialized (max_size={CoevolutionConfig.hall_of_fame_size})")
     
     # ===================================================================
     # FIX 3: Learning Rate Decay with MINIMUM FLOOR
@@ -311,7 +313,7 @@ def train_with_coevolution_lgp(
         for param_group in optimizer.param_groups:
             param_group['lr'] = current_lr
         
-        lr_status = "✓" if current_lr > min_lr else "⚠️ AT FLOOR"
+        lr_status = "OK" if current_lr > min_lr else "WARN AT FLOOR"
         print(f"  Learning rate: {current_lr:.6f} (decay: {decay_factor**gen:.4f}) {lr_status}")
 
         # 1) Sinh portfolios từ programs
@@ -342,7 +344,7 @@ def train_with_coevolution_lgp(
             programs_to_explore = list(range(K))
             random.shuffle(programs_to_explore)
             forced_idx = 0
-            print(f"  🔍 FORCED EXPLORATION MODE: Sampling all programs (NO PPO update on forced)")
+            print(f"  FORCED EXPLORATION MODE: Sampling all programs (NO PPO update on forced)")
 
         # 2) PPO training trong generation này
         for ep in range(cfg.episodes_per_gen):
@@ -356,14 +358,15 @@ def train_with_coevolution_lgp(
             
             state = env.reset()
 
-            # Separate lists for forced vs policy actions
-            states_list = []
-            actions_list = []
-            log_probs_list = []
-            values_list = []
-            rewards = []
-            masks = []
-            is_forced_action = []  # FIX 2: Track which actions were forced
+            # Separate lists for forced vs policy actions (policy-only lists avoid filtering later)
+            states_policy = []
+            actions_policy = []
+            log_probs_policy = []
+            values_policy = []
+            rewards_policy = []
+            masks_policy = []
+            num_forced = 0
+            num_policy = 0
 
             ep_return = 0.0
             total_policy_loss = 0.0
@@ -384,13 +387,16 @@ def train_with_coevolution_lgp(
                 
                 next_state, reward, done, info = env.step(action)
 
-                states_list.append(state)
-                actions_list.append(action)
-                log_probs_list.append(log_prob)
-                values_list.append(value.squeeze(0))
-                rewards.append(reward)
-                masks.append(0.0 if done else 1.0)
-                is_forced_action.append(was_forced)  # FIX 2: Track
+                if was_forced:
+                    num_forced += 1
+                else:
+                    num_policy += 1
+                    states_policy.append(state)
+                    actions_policy.append(action)
+                    log_probs_policy.append(log_prob)
+                    values_policy.append(value.squeeze(0))
+                    rewards_policy.append(reward)
+                    masks_policy.append(0.0 if done else 1.0)
 
                 usage[action] += 1
                 sum_reward[action] += reward
@@ -401,34 +407,19 @@ def train_with_coevolution_lgp(
                     break
 
             # FIX 2: SKIP PPO update if ALL actions were forced
-            num_forced = sum(is_forced_action)
-            num_policy = len(is_forced_action) - num_forced
-            
             if num_policy == 0:
                 # All forced - skip PPO update entirely
                 avg_pl = 0.0
                 avg_vl = 0.0
             else:
-                # Filter to only policy actions for PPO update
-                policy_indices = [i for i, forced in enumerate(is_forced_action) if not forced]
-                
-                if len(policy_indices) > 0:
-                    # Extract only non-forced data
-                    states_policy = [states_list[i] for i in policy_indices]
-                    actions_policy = [actions_list[i] for i in policy_indices]
-                    log_probs_policy = [log_probs_list[i] for i in policy_indices]
-                    values_policy = [values_list[i] for i in policy_indices]
-                    rewards_policy = [rewards[i] for i in policy_indices]
-                    masks_policy = [masks[i] for i in policy_indices]
-                    
+                if len(states_policy) > 0:
                     # PPO update on policy actions only
                     returns = compute_returns_fn(rewards_policy, masks_policy, gamma=PPOConfig.gamma)
-                    returns_t = torch.tensor(returns, dtype=torch.float32)
-                    values_t = torch.stack(values_policy)
-                    log_probs_old = torch.stack(log_probs_policy).detach()
-                    states_np = np.array(states_policy, dtype=np.float32)
-                    states_t = torch.from_numpy(states_np)
-                    actions_t = torch.tensor(actions_policy, dtype=torch.int64)
+                    returns_t = torch.as_tensor(returns, dtype=torch.float32, device=device)
+                    values_t = torch.stack(values_policy).to(device).squeeze(-1)
+                    log_probs_old = torch.stack(log_probs_policy).to(device).squeeze(-1).detach()
+                    states_t = torch.as_tensor(states_policy, dtype=torch.float32, device=device)
+                    actions_t = torch.as_tensor(actions_policy, dtype=torch.int64, device=device)
 
                     advantages = returns_t - values_t.detach()
                     if len(advantages) > 1:
@@ -511,17 +502,17 @@ def train_with_coevolution_lgp(
         # FIX 1: Update Hall of Fame with best program from this generation
         # ===================================================================
         if hall_of_fame.try_add(lgp_programs[best_idx], best_fitness, gen + 1, best_idx):
-            print(f"  🏆 NEW ENTRY in Hall of Fame! fitness={best_fitness:.2f}")
+            print(f"  NEW ENTRY in Hall of Fame! fitness={best_fitness:.2f}")
         
         # Check if current best is worse than HoF best (program was lost!)
         hof_best_fitness = hall_of_fame.get_best_fitness()
         if best_fitness < hof_best_fitness - 10:  # Lost more than 10 fitness points
-            print(f"  ⚠️ WARNING: Current best ({best_fitness:.2f}) is worse than HoF best ({hof_best_fitness:.2f})")
-            print(f"  🔄 Restoring HoF best program to pool...")
+            print(f"  WARNING: Current best ({best_fitness:.2f}) is worse than HoF best ({hof_best_fitness:.2f})")
+            print(f"  Restoring HoF best program to pool...")
             # Find a low-performing slot to restore the best program
             worst_idx = int(np.argmin(avg_reward))
             if hall_of_fame.restore_best_to_pool(lgp_programs, worst_idx):
-                print(f"  ✓ Restored HoF best to index {worst_idx}")
+                print(f"  Restored HoF best to index {worst_idx}")
         
         hall_of_fame.print_status()
 
@@ -544,7 +535,7 @@ def train_with_coevolution_lgp(
         # ===================================================================
         hof_protected_indices = set(hall_of_fame.find_matching_indices(lgp_programs))
         if hof_protected_indices:
-            print(f"  🛡️ Hall of Fame protected indices: {sorted(hof_protected_indices)}")
+            print(f"  Hall of Fame protected indices: {sorted(hof_protected_indices)}")
         
         # ===================================================================
         # DIVERSITY MECHANISM 1: Protect unused programs in early generations

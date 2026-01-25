@@ -12,6 +12,7 @@ import copy
 import random
 import math
 from registries.mh_registry import register_mh
+from environment.env_utils import get_op_processing_time
 
 
 def _build_schedule_from_order(
@@ -50,7 +51,6 @@ def _build_schedule_from_order(
         info = unfinished_jobs[job]
         
         for op in sorted(info['operations'], key=lambda x: x['op_index']):
-            pt = op['processing_time']
             best_start = float('inf')
             best_finish = float('inf')
             best_machine = None
@@ -59,6 +59,7 @@ def _build_schedule_from_order(
                 if m not in machine_ready:
                     machine_ready[m] = current_time
                 st = max(job_ready.get(job, current_time), machine_ready[m])
+                pt = get_op_processing_time(op, m)
                 ft = st + pt
                 if ft < best_finish:
                     best_finish = ft
@@ -83,6 +84,8 @@ def _build_schedule_from_order(
                 'op_id': op['op_id'],
                 'candidate_machines': op['candidate_machines']
             }
+            if 'processing_times' in op:
+                event['processing_times'] = op['processing_times']
             new_events.append(event)
             job_ready[job] = best_finish
             machine_ready[best_machine] = best_finish
@@ -143,7 +146,7 @@ def mh_sa(env,
     job_list = list(unfinished_jobs.keys())
     current_order = sorted(job_list, key=lambda j: (
         unfinished_jobs[j]['due_date'],
-        sum(op['processing_time'] for op in unfinished_jobs[j]['operations'])
+        sum(get_op_processing_time(op) for op in unfinished_jobs[j]['operations'])
     ))
     
     current_schedule = _build_schedule_from_order(current_order, unfinished_jobs, current_time, machine_pool)
@@ -224,7 +227,7 @@ def mh_ga(env,
     population.append(edd_order)
     
     # SPT ordering
-    spt_order = sorted(job_list, key=lambda j: sum(op['processing_time'] for op in unfinished_jobs[j]['operations']))
+    spt_order = sorted(job_list, key=lambda j: sum(get_op_processing_time(op) for op in unfinished_jobs[j]['operations']))
     population.append(spt_order)
     
     # Random orderings
@@ -324,7 +327,7 @@ def mh_pso(env,
     
     # EDD and SPT as initial particles
     edd_order = sorted(job_list, key=lambda j: unfinished_jobs[j]['due_date'])
-    spt_order = sorted(job_list, key=lambda j: sum(op['processing_time'] for op in unfinished_jobs[j]['operations']))
+    spt_order = sorted(job_list, key=lambda j: sum(get_op_processing_time(op) for op in unfinished_jobs[j]['operations']))
     
     particles.append(edd_order.copy())
     particles.append(spt_order.copy())

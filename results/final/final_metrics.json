@@ -1,8 +1,8 @@
 {
   "generation": 20,
   "metrics": {
-    "makespan": 201,
-    "tardiness_normal": 0,
-    "tardiness_urgent": 0
+    "makespan": 1386.0,
+    "tardiness_normal": 6408.0,
+    "tardiness_urgent": 1062.0
   }
 }

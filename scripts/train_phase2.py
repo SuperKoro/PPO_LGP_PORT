@@ -130,6 +130,18 @@ def train_phase2(num_episodes=2000, save_every=200):
     
     all_returns = []
     all_makespans = []
+    all_policy_losses = []
+    all_value_losses = []
+    all_total_losses = []
+    all_entropy = []
+    all_approx_kl = []
+    all_clip_frac = []
+    all_reward_mean = []
+    all_reward_std = []
+    all_return_mean = []
+    all_return_std = []
+    all_adv_mean = []
+    all_adv_std = []
     best_return = float('-inf')
     best_makespan = float('inf')
     best_schedule = None
@@ -137,6 +149,11 @@ def train_phase2(num_episodes=2000, save_every=200):
     
     os.makedirs("results/phase2", exist_ok=True)
     
+    # Local bindings for speed inside the loop
+    select_action_fn = select_action
+    compute_returns_fn = compute_returns
+    ppo_update_fn = ppo_update
+
     for ep in range(num_episodes):
         env.seed(RANDOM_SEED + ep)
         state = env.reset()
@@ -145,7 +162,7 @@ def train_phase2(num_episodes=2000, save_every=200):
         
         done = False
         while not done:
-            action, log_prob, value = select_action(model, state)
+            action, log_prob, value = select_action_fn(model, state)
             next_state, reward, done, _ = env.step(action)
             
             states.append(state)
@@ -177,11 +194,52 @@ def train_phase2(num_episodes=2000, save_every=200):
             best_schedule_ep = ep + 1
         
         # PPO update
-        returns = compute_returns(rewards, masks, gamma=PPOConfig.gamma)
-        advantages = [r - v.item() for r, v in zip(returns, values)]
-        
-        ppo_update(model, optimizer, states, actions, log_probs, returns, advantages,
-                   clip_epsilon=PPOConfig.clip_epsilon, ppo_epochs=PPOConfig.ppo_epochs)
+        returns = compute_returns_fn(rewards, masks, gamma=PPOConfig.gamma)
+        rewards_arr = np.asarray(rewards, dtype=np.float32)
+        returns_arr = np.asarray(returns, dtype=np.float32)
+
+        # Vectorized advantage computation (avoid Python loop)
+        if values:
+            values_arr = torch.stack(values).squeeze(-1).cpu().numpy()
+        else:
+            values_arr = np.array([], dtype=np.float32)
+        if len(returns_arr) == 0:
+            returns_mean = 0.0
+            returns_std = 1.0
+        else:
+            returns_mean = float(returns_arr.mean())
+            returns_std = float(returns_arr.std() + 1e-8)
+        advantages = returns_arr - values_arr
+        adv_arr = np.asarray(advantages, dtype=np.float32)
+
+        all_reward_mean.append(float(rewards_arr.mean()) if len(rewards_arr) else 0.0)
+        all_reward_std.append(float(rewards_arr.std()) if len(rewards_arr) else 0.0)
+        all_return_mean.append(float(returns_arr.mean()) if len(returns_arr) else 0.0)
+        all_return_std.append(float(returns_arr.std()) if len(returns_arr) else 0.0)
+        all_adv_mean.append(float(adv_arr.mean()) if len(adv_arr) else 0.0)
+        all_adv_std.append(float(adv_arr.std()) if len(adv_arr) else 0.0)
+
+        policy_loss, value_loss, total_loss, ppo_metrics = ppo_update_fn(
+            model,
+            optimizer,
+            states,
+            actions,
+            log_probs,
+            returns_arr,
+            advantages,
+            clip_epsilon=PPOConfig.clip_epsilon,
+            ppo_epochs=PPOConfig.ppo_epochs,
+            entropy_coef=PPOConfig.entropy_coef,
+            normalize_returns=True,
+            returns_mean=returns_mean,
+            returns_std=returns_std
+        )
+        all_policy_losses.append(policy_loss)
+        all_value_losses.append(value_loss)
+        all_total_losses.append(total_loss)
+        all_entropy.append(ppo_metrics.get("entropy", 0.0))
+        all_approx_kl.append(ppo_metrics.get("approx_kl", 0.0))
+        all_clip_frac.append(ppo_metrics.get("clip_frac", 0.0))
         
         if (ep + 1) % 50 == 0:
             avg_return = np.mean(all_returns[-50:])
@@ -195,7 +253,19 @@ def train_phase2(num_episodes=2000, save_every=200):
         'makespans': all_makespans,
         'best_return': best_return,
         'best_makespan': best_makespan,
-        'best_schedule_episode': best_schedule_ep
+        'best_schedule_episode': best_schedule_ep,
+        'policy_losses': all_policy_losses,
+        'value_losses': all_value_losses,
+        'total_losses': all_total_losses,
+        'reward_mean': all_reward_mean,
+        'reward_std': all_reward_std,
+        'return_mean': all_return_mean,
+        'return_std': all_return_std,
+        'adv_mean': all_adv_mean,
+        'adv_std': all_adv_std,
+        'entropy': all_entropy,
+        'approx_kl': all_approx_kl,
+        'clip_frac': all_clip_frac
     }
     
     with open("results/phase2/training_metrics.json", 'w') as f:

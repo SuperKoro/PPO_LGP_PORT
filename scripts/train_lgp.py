@@ -107,10 +107,10 @@ def main():
     
     # Set random seeds
     set_random_seeds(RANDOM_SEED)
-    print(f"✓ Random seed set to: {RANDOM_SEED}")
+    print(f"OK: Random seed set to: {RANDOM_SEED}")
     
     # Initialize LGP programs FIRST
-    print(f"\n📋 Initializing {LGPConfig.pool_size} LGP programs...")
+    print(f"\nInitializing {LGPConfig.pool_size} LGP programs...")
     lgp_programs = initialize_lgp_programs(
         pool_size=LGPConfig.pool_size,
         max_length=LGPConfig.max_program_length,
@@ -118,16 +118,16 @@ def main():
         num_registers=LGPConfig.num_registers,
         seed=RANDOM_SEED
     )
-    print(f"✓ Initialized {len(lgp_programs)} programs")
+    print(f"OK: Initialized {len(lgp_programs)} programs")
     
     # Create dummy action library with CORRECT SIZE (= pool_size)
     # This ensures environment's action_space matches the number of LGP programs
-    print(f"\n📦 Creating action library with {LGPConfig.pool_size} slots...")
+    print(f"\nCreating action library with {LGPConfig.pool_size} slots...")
     dummy_action_library = create_dummy_action_library(LGPConfig.pool_size)
-    print(f"✓ Action library created with {len(dummy_action_library)} portfolios")
+    print(f"OK: Action library created with {len(dummy_action_library)} portfolios")
     
     # Initialize environment WITH CORRECT ACTION LIBRARY SIZE
-    print(f"\n🏭 Creating scheduling environment...")
+    print(f"\nCreating scheduling environment...")
     env = DynamicSchedulingEnv(
         lambda_tardiness=1.0,  # Used for initial schedule creation only
         action_library=dummy_action_library,  # FIX: Pass dummy library with correct size!
@@ -136,22 +136,22 @@ def main():
     )
     obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.n  # Now act_dim = pool_size = 64
-    print(f"✓ Environment created: obs_dim={obs_dim}, act_dim={act_dim}")
+    print(f"OK: Environment created: obs_dim={obs_dim}, act_dim={act_dim}")
     
     # Verify action space matches pool size
     assert act_dim == LGPConfig.pool_size, \
-        f"❌ ACTION SPACE MISMATCH! act_dim={act_dim} but pool_size={LGPConfig.pool_size}"
-    print(f"✓ Action space verified: {act_dim} actions = {LGPConfig.pool_size} LGP programs")
+        f"ACTION SPACE MISMATCH! act_dim={act_dim} but pool_size={LGPConfig.pool_size}"
+    print(f"OK: Action space verified: {act_dim} actions = {LGPConfig.pool_size} LGP programs")
     
     # Initialize PPO model
-    print(f"\n🧠 Creating PPO model...")
+    print(f"\nCreating PPO model...")
     model = PPOActorCritic(obs_dim, act_dim)
     optimizer = optim.Adam(model.parameters(), lr=PPOConfig.learning_rate)
-    print(f"✓ PPO model created with lr={PPOConfig.learning_rate}")
+    print(f"OK: PPO model created with lr={PPOConfig.learning_rate}")
     
     # Configure coevolution - use CoevolutionConfig directly
-    print(f"\n⚙️  Configuring coevolution...")
-    print(f"✓ Configuration: {CoevolutionConfig.num_generations} generations, {CoevolutionConfig.episodes_per_gen} episodes/gen")
+    print(f"\nConfiguring coevolution...")
+    print(f"OK: Configuration: {CoevolutionConfig.num_generations} generations, {CoevolutionConfig.episodes_per_gen} episodes/gen")
     
     # Create output directory
     output_dir = "results"
@@ -160,11 +160,11 @@ def main():
     os.makedirs(os.path.join(output_dir, "programs"), exist_ok=True)
     os.makedirs(os.path.join(output_dir, "models"), exist_ok=True)
     os.makedirs(os.path.join(output_dir, "portfolios"), exist_ok=True)
-    print(f"\n📁 Output directory: {output_dir}/")
+    print(f"\nOutput directory: {output_dir}/")
     
     # Start training
     print(f"\n" + "=" * 70)
-    print("🚀 STARTING TRAINING")
+    print("STARTING TRAINING")
     print("=" * 70)
     lgp_programs, final_action_library = train_with_coevolution_lgp(
         env=env,
@@ -180,7 +180,7 @@ def main():
     # Save results
     model_path = os.path.join(output_dir, "models", "trained_policy.pth")
     torch.save(model.state_dict(), model_path)
-    print(f"\n✓ Model saved to: {model_path}")
+    print(f"\nOK: Model saved to: {model_path}")
     
     # Save program info
     programs_data = {
@@ -190,10 +190,10 @@ def main():
     lgp_path = os.path.join(output_dir, "programs", "lgp_programs_final.json")
     with open(lgp_path, 'w') as f:
         json.dump(programs_data, f, indent=2)
-    print(f"✓ LGP programs saved to: {lgp_path}")
+    print(f"OK: LGP programs saved to: {lgp_path}")
     
     print(f"\n" + "=" * 70)
-    print("✅ TRAINING COMPLETE")
+    print("TRAINING COMPLETE")
     print("=" * 70)
     print(f"\nResults saved in: {output_dir}/")
     print(f"  - Model: {model_path}")

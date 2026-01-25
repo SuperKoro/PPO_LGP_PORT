@@ -15,6 +15,7 @@ from environment.env_utils import (
     schedule_dict_to_list,
     split_schedule_list,
     create_unified_jobs_info,
+    get_op_processing_time,
     machine_pool
 )
 from environment.dataset_loader import load_dataset
@@ -41,12 +42,44 @@ class DynamicSchedulingEnv(gym.Env):
         self.lambda_tardiness = lambda_tardiness
         
         # Load dataset (either from file or use default hardcoded)
-        jobs_initial, due_dates_initial, machine_pool_loaded = load_dataset(dataset_name)
+        jobs_all, due_dates_all, machine_pool_loaded, arrival_times, initial_job_ids, job_types = load_dataset(
+            dataset_name, return_meta=True
+        )
         
         self.machine_pool = machine_pool_loaded
+
+        # If dataset provides arrival_times + initial_job_ids, use predefined dynamic jobs
+        self._predefined_dynamic_jobs = None
+        if arrival_times is not None and initial_job_ids is not None:
+            jobs_initial = {jid: jobs_all[jid] for jid in initial_job_ids}
+            due_dates_initial = {jid: due_dates_all[jid] for jid in initial_job_ids}
+
+            dynamic_jobs_events = []
+            for jid, ops in jobs_all.items():
+                if jid in jobs_initial:
+                    continue
+                dyn_job = {
+                    'job_id': jid,
+                    'arrival_time': arrival_times.get(jid, 0),
+                    'due_date': due_dates_all[jid],
+                    'operations': ops,
+                    'job_type': (job_types.get(jid) if job_types else 'Normal'),
+                }
+                dynamic_jobs_events.append((dyn_job['arrival_time'], dyn_job))
+
+            dynamic_jobs_events.sort(key=lambda x: (x[0], x[1]['job_id']))
+            self._predefined_dynamic_jobs = dynamic_jobs_events
+        else:
+            jobs_initial = jobs_all
+            due_dates_initial = due_dates_all
+        
         self.jobs_initial = jobs_initial
         self.due_dates_initial = due_dates_initial
+        self._job_types = job_types
         self.all_jobs_info = create_unified_jobs_info(self.jobs_initial, self.due_dates_initial)
+        if self._job_types:
+            for jid in self.jobs_initial.keys():
+                self.all_jobs_info[jid]['job_type'] = self._job_types.get(jid, 'Normal')
         
         # Create initial schedule once offline
         _, schedule, _, _, _, _ = simulated_annealing(
@@ -57,7 +90,11 @@ class DynamicSchedulingEnv(gym.Env):
         self.initial_schedule_events = schedule_dict_to_list(schedule, self.all_jobs_info)
         self.current_schedule_events = copy.deepcopy(self.initial_schedule_events)
         self.current_time = 0
-        self._generate_dynamic_jobs(num_dynamic=EnvironmentConfig.num_dynamic_jobs)
+        # Use predefined dynamic jobs if available, else generate randomly
+        if self._predefined_dynamic_jobs is not None:
+            self.dynamic_jobs_events = copy.deepcopy(self._predefined_dynamic_jobs)
+        else:
+            self._generate_dynamic_jobs(num_dynamic=EnvironmentConfig.num_dynamic_jobs)
         self.current_dynamic_index = 0
         
         # Action library + budget
@@ -175,9 +212,17 @@ class DynamicSchedulingEnv(gym.Env):
     def reset(self):
         """Reset environment to initial state."""
         self.current_time = 0
+        if hasattr(self, "_last_cost"):
+            self._last_cost = None
         self.all_jobs_info = create_unified_jobs_info(self.jobs_initial, self.due_dates_initial)
+        if self._job_types:
+            for jid in self.jobs_initial.keys():
+                self.all_jobs_info[jid]['job_type'] = self._job_types.get(jid, 'Normal')
         self.current_schedule_events = copy.deepcopy(self.initial_schedule_events)
-        self._generate_dynamic_jobs(num_dynamic=EnvironmentConfig.num_dynamic_jobs)
+        if self._predefined_dynamic_jobs is not None:
+            self.dynamic_jobs_events = copy.deepcopy(self._predefined_dynamic_jobs)
+        else:
+            self._generate_dynamic_jobs(num_dynamic=EnvironmentConfig.num_dynamic_jobs)
         self.current_dynamic_index = 0
         return self._get_state()
 
@@ -212,7 +257,7 @@ class DynamicSchedulingEnv(gym.Env):
         count = 0
         for info in unfinished_jobs.values():
             for op in info['operations']:
-                total_pt += op['processing_time']
+                total_pt += get_op_processing_time(op)
                 count += 1
         avg_pt = total_pt / count if count > 0 else 0
         
@@ -222,7 +267,7 @@ class DynamicSchedulingEnv(gym.Env):
         due_dates = []
         
         for job, info in unfinished_jobs.items():
-            remaining_pt = sum(op['processing_time'] for op in info['operations'])
+            remaining_pt = sum(get_op_processing_time(op) for op in info['operations'])
             slack = info['due_date'] - self.current_time - remaining_pt
             slacks.append(slack)
             due_dates.append(info['due_date'])
@@ -289,14 +334,11 @@ class DynamicSchedulingEnv(gym.Env):
             if job_events:
                 comp_time = max(e['finish'] for e in job_events)
                 tardiness = max(0, comp_time - info['due_date'])
-                
-                if isinstance(job, int):
-                    total_tardiness_normal += tardiness
+
+                if info.get('job_type', 'Normal') == 'Urgent':
+                    total_tardiness_urgent += tardiness
                 else:
-                    if info.get('job_type', 'Normal') == 'Urgent':
-                        total_tardiness_urgent += tardiness
-                    else:
-                        total_tardiness_normal += tardiness
+                    total_tardiness_normal += tardiness
         
         return {
             "makespan": makespan, 
@@ -335,12 +377,15 @@ class DynamicSchedulingEnv(gym.Env):
         # Add new dynamic job to unfinished
         ops_list = []
         for i, op in enumerate(dyn_job['operations']):
-            ops_list.append({
+            op_entry = {
                 'op_index': i,
                 'op_id': op['op_id'],
                 'candidate_machines': op['candidate_machines'],
                 'processing_time': op['processing_time'],
-            })
+            }
+            if 'processing_times' in op:
+                op_entry['processing_times'] = op['processing_times']
+            ops_list.append(op_entry)
         
         dyn_info = {
             'job_ready': self.current_time,
@@ -377,14 +422,11 @@ class DynamicSchedulingEnv(gym.Env):
                 continue
             comp_time = max(e['finish'] for e in job_events)
             tardiness = max(0, comp_time - info['due_date'])
-            
-            if isinstance(job, int):
-                total_tardiness_normal += tardiness
+
+            if info.get('job_type', 'Normal') == 'Urgent':
+                total_tardiness_urgent += tardiness
             else:
-                if info.get('job_type', 'Normal') == 'Urgent':
-                    total_tardiness_urgent += tardiness
-                else:
-                    total_tardiness_normal += tardiness
+                total_tardiness_normal += tardiness
 
         # Reward function using config parameters
         # Reward = -(alpha * makespan + (1-alpha) * (tardiness_normal + beta * tardiness_urgent))
@@ -393,7 +435,12 @@ class DynamicSchedulingEnv(gym.Env):
         
         # Combined cost: weighted sum of makespan and tardiness
         cost = alpha * makespan + (1 - alpha) * (total_tardiness_normal + beta * total_tardiness_urgent)
-        reward = -cost  # Negative because we want to minimize
+
+        # Use delta-cost reward for better scaling and stability
+        if getattr(self, "_last_cost", None) is None:
+            self._last_cost = cost
+        reward = -(cost - self._last_cost)
+        self._last_cost = cost
 
         self.current_dynamic_index += 1
         done = self.current_dynamic_index >= len(self.dynamic_jobs_events)

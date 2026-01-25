@@ -14,6 +14,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from training.portfolio_types import ActionIndividual, Gene
+from config import LGPConfig
 
 
 def load_all_elite_portfolios(results_dir="results"):
@@ -43,7 +44,7 @@ def load_all_elite_portfolios(results_dir="results"):
                 })
     
     # Sort by fitness (best first)
-    all_portfolios.sort(key=lambda x: x['fitness'])
+    all_portfolios.sort(key=lambda x: x['fitness'], reverse=True)
     
     return all_portfolios
 
@@ -76,10 +77,11 @@ def main():
     print("=" * 60)
     
     all_portfolios = load_all_elite_portfolios()
-    print(f"\n✓ Loaded {len(all_portfolios)} elite portfolios")
+    print(f"\nOK: Loaded {len(all_portfolios)} elite portfolios")
     
-    top_portfolios = extract_top_unique(all_portfolios, top_k=10)
-    print(f"✓ Found {len(top_portfolios)} unique portfolios")
+    top_k = LGPConfig.pool_size
+    top_portfolios = extract_top_unique(all_portfolios, top_k=top_k)
+    print(f"OK: Found {len(top_portfolios)} unique portfolios")
     
     print("\n" + "=" * 60)
     print("TOP PORTFOLIOS")
@@ -96,8 +98,8 @@ def main():
     with open(output_file, 'w') as f:
         json.dump({'portfolios': top_portfolios}, f, indent=2)
     
-    print(f"\n✓ Saved to: {output_file}")
-    print("\n✅ DONE - Use these portfolios for Phase 2!")
+    print(f"\nOK: Saved to: {output_file}")
+    print("\nDONE - Use these portfolios for Phase 2!")
 
 
 if __name__ == "__main__":
