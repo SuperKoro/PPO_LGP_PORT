@@ -19,7 +19,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from config import RANDOM_SEED, PPOConfig, EnvironmentConfig
-from training.ppo_model import PPOActorCritic, select_action, compute_returns, ppo_update
+from training.ppo_model import PPOActorCritic, select_action, compute_gae, ppo_update
 from training.portfolio_types import ActionIndividual, Gene
 from environment.scheduling_env import DynamicSchedulingEnv
 import registries.dispatching_rules
@@ -130,6 +130,8 @@ def train_phase2(num_episodes=2000, save_every=200):
     
     all_returns = []
     all_makespans = []
+    all_tardiness_normal = []
+    all_tardiness_urgent = []
     all_policy_losses = []
     all_value_losses = []
     all_total_losses = []
@@ -151,7 +153,7 @@ def train_phase2(num_episodes=2000, save_every=200):
     
     # Local bindings for speed inside the loop
     select_action_fn = select_action
-    compute_returns_fn = compute_returns
+    compute_gae_fn = compute_gae
     ppo_update_fn = ppo_update
 
     for ep in range(num_episodes):
@@ -165,11 +167,15 @@ def train_phase2(num_episodes=2000, save_every=200):
             action, log_prob, value = select_action_fn(model, state)
             next_state, reward, done, _ = env.step(action)
             
+            # Reward Scaling - giúp đưa reward về khoảng nhỏ hơn
+            # Giúp Critic dễ học hơn, Value Loss không quá lớn
+            scaled_reward = reward / 100.0
+            
             states.append(state)
             actions.append(action)
             log_probs.append(log_prob)
             values.append(value)
-            rewards.append(reward)
+            rewards.append(scaled_reward)  # Lưu scaled reward
             masks.append(1 - float(done))
             
             state = next_state
@@ -177,10 +183,14 @@ def train_phase2(num_episodes=2000, save_every=200):
         ep_return = sum(rewards)
         all_returns.append(ep_return)
         
-        # Get makespan
+        # Get makespan and tardiness
         metrics = env.get_metrics()
         makespan = metrics['makespan']
+        tardiness_normal = metrics.get('tardiness_normal', 0)
+        tardiness_urgent = metrics.get('tardiness_urgent', 0)
         all_makespans.append(makespan)
+        all_tardiness_normal.append(tardiness_normal)
+        all_tardiness_urgent.append(tardiness_urgent)
         
         # Track best
         if ep_return > best_return:
@@ -193,23 +203,19 @@ def train_phase2(num_episodes=2000, save_every=200):
             best_schedule = [dict(e) for e in env.current_schedule_events]  # Deep copy
             best_schedule_ep = ep + 1
         
-        # PPO update
-        returns = compute_returns_fn(rewards, masks, gamma=PPOConfig.gamma)
+        # PPO update với GAE
+        # Chuyển values thành list floats để compute_gae
+        values_list = [v.item() if isinstance(v, torch.Tensor) else float(v) for v in values]
+        
+        # Tính GAE (Generalized Advantage Estimation)
+        returns, advantages = compute_gae_fn(
+            rewards, values_list, masks, 
+            gamma=PPOConfig.gamma, 
+            lam=0.95  # GAE lambda
+        )
+        
         rewards_arr = np.asarray(rewards, dtype=np.float32)
         returns_arr = np.asarray(returns, dtype=np.float32)
-
-        # Vectorized advantage computation (avoid Python loop)
-        if values:
-            values_arr = torch.stack(values).squeeze(-1).cpu().numpy()
-        else:
-            values_arr = np.array([], dtype=np.float32)
-        if len(returns_arr) == 0:
-            returns_mean = 0.0
-            returns_std = 1.0
-        else:
-            returns_mean = float(returns_arr.mean())
-            returns_std = float(returns_arr.std() + 1e-8)
-        advantages = returns_arr - values_arr
         adv_arr = np.asarray(advantages, dtype=np.float32)
 
         all_reward_mean.append(float(rewards_arr.mean()) if len(rewards_arr) else 0.0)
@@ -225,14 +231,13 @@ def train_phase2(num_episodes=2000, save_every=200):
             states,
             actions,
             log_probs,
-            returns_arr,
+            returns,
             advantages,
             clip_epsilon=PPOConfig.clip_epsilon,
             ppo_epochs=PPOConfig.ppo_epochs,
             entropy_coef=PPOConfig.entropy_coef,
-            normalize_returns=True,
-            returns_mean=returns_mean,
-            returns_std=returns_std
+            vf_coef=0.01,  # Value function coefficient
+            max_grad_norm=0.5
         )
         all_policy_losses.append(policy_loss)
         all_value_losses.append(value_loss)
@@ -251,6 +256,8 @@ def train_phase2(num_episodes=2000, save_every=200):
     metrics_data = {
         'returns': all_returns,
         'makespans': all_makespans,
+        'tardiness_normal': all_tardiness_normal,
+        'tardiness_urgent': all_tardiness_urgent,
         'best_return': best_return,
         'best_makespan': best_makespan,
         'best_schedule_episode': best_schedule_ep,

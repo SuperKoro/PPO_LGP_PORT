@@ -1,30 +1,33 @@
 """
 PPO (Proximal Policy Optimization) Model for PPO+LGP.
 Neural network architecture and action selection for PPO agent.
+Optimized with GAE (Generalized Advantage Estimation).
 """
 
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class PPOActorCritic(nn.Module):
     """
     Actor-Critic network for PPO.
-    
-    - Actor: Policy network (outputs action probabilities)
-    - Critic: Value network (estimates state values)
     """
-    
     def __init__(self, obs_dim, act_dim):
         super(PPOActorCritic, self).__init__()
+        # Shared features
         self.fc = nn.Sequential(
             nn.Linear(obs_dim, 64),
-            nn.ReLU(),
+            nn.Tanh(),  # Tanh thường ổn định hơn ReLU cho RL
             nn.Linear(64, 64),
-            nn.ReLU()
+            nn.Tanh()
         )
+        
+        # Actor head (Policy)
         self.policy_head = nn.Linear(64, act_dim)
+        
+        # Critic head (Value)
         self.value_head = nn.Linear(64, 1)
         
     def forward(self, x):
@@ -33,51 +36,78 @@ class PPOActorCritic(nn.Module):
         value = self.value_head(x)
         return logits, value
 
+    def get_value(self, x):
+        """Helper to get only value"""
+        x = self.fc(x)
+        return self.value_head(x)
+
 
 def select_action(model, state, deterministic=False):
     """
     Select action using policy network.
-    
-    Args:
-        model: PPOActorCritic network
-        state: Current state observation
-        deterministic: If True, select action with highest probability (for evaluation)
-                      If False, sample from distribution (for training)
-        
-    Returns:
-        action: Selected action index
-        log_prob: Log probability of selected action
-        value: State value estimate
     """
     device = next(model.parameters()).device
-    state_tensor = torch.as_tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+    state_tensor = torch.as_tensor(state, dtype=torch.float32, device=device)
+    if state_tensor.ndim == 1:
+        state_tensor = state_tensor.unsqueeze(0)
+
     with torch.no_grad():
         logits, value = model(state_tensor)
         dist = torch.distributions.Categorical(logits=logits)
+        
         if deterministic:
-            # ⭐ FIX: For evaluation, use argmax (no randomness)
             action = torch.argmax(logits, dim=-1)
         else:
-            # For training, sample from distribution (allows exploration)
             action = dist.sample()
 
         log_prob = dist.log_prob(action)
 
-    # Keep log_prob/value as 1D tensors to avoid (T,1) vs (T) broadcast issues.
-    return action.item(), log_prob.squeeze(-1), value.squeeze(-1)
+    return action.item(), log_prob.squeeze(), value.squeeze()
 
 
-def compute_returns(rewards, masks, gamma=0.9):
+def compute_gae(rewards, values, masks, gamma=0.99, lam=0.95):
     """
-    Compute discounted returns.
+    Generalized Advantage Estimation (GAE).
+    Tính toán Advantage và Return chuẩn xác hơn Monte Carlo truyền thống.
     
     Args:
-        rewards: List of rewards
-        masks: List of masks (1 = continue, 0 = terminal)
+        rewards: List rewards
+        values: List values từ Critic (bao gồm cả value của state cuối cùng)
+        masks: List masks (1 nếu continue, 0 nếu done)
         gamma: Discount factor
+        lam: GAE lambda parameter
         
     Returns:
-        List of discounted returns
+        returns: List of computed returns (targets for critic)
+        advantages: List of advantages (for policy update)
+    """
+    gae = 0
+    returns = []
+    advantages = []
+    
+    # values thường có độ dài len(rewards) + 1 (để tính delta bước cuối)
+    # Nếu values chỉ bằng len(rewards), ta giả định next_value = 0
+    if len(values) == len(rewards):
+        values = list(values) + [0.0]
+        
+    for step in reversed(range(len(rewards))):
+        delta = rewards[step] + gamma * values[step + 1] * masks[step] - values[step]
+        gae = delta + gamma * lam * masks[step] * gae
+        
+        # Advantage tại bước t
+        advantages.insert(0, gae)
+        
+        # Return = Advantage + Value (Target cho Critic)
+        returns.insert(0, gae + values[step])
+        
+    return returns, advantages
+
+
+# Keep old compute_returns for backward compatibility
+def compute_returns(rewards, masks, gamma=0.99):
+    """
+    Compute discounted returns (Monte Carlo style).
+    Kept for backward compatibility.
     """
     returns = []
     R = 0
@@ -89,113 +119,90 @@ def compute_returns(rewards, masks, gamma=0.9):
 
 def ppo_update(model, optimizer, states, actions, old_log_probs, returns, advantages,
                clip_epsilon=0.2, ppo_epochs=4, entropy_coef=0.01, vf_coef=0.01,
-               normalize_returns=True, returns_mean=None, returns_std=None):
+               max_grad_norm=0.5):
     """
-    Perform PPO update step.
+    Hàm update PPO chuẩn.
+    NOTE: advantages và returns phải được tính TOÀN BỘ trước khi gọi hàm này.
     
-    Args:
-        model: PPOActorCritic network
-        optimizer: PyTorch optimizer
-        states: Batch of states
-        actions: Batch of actions taken
-        old_log_probs: Log probs of actions under old policy
-        returns: Computed returns
-        advantages: Advantage estimates
-        clip_epsilon: PPO clipping parameter
-        ppo_epochs: Number of PPO update epochs
-        entropy_coef: Entropy bonus coefficient
-        
     Returns:
-        Tuple of (policy_loss, value_loss, total_loss)
+        Tuple of (policy_loss, value_loss, entropy, metrics_dict)
     """
     device = next(model.parameters()).device
 
-    # Convert list of numpy arrays to a single contiguous array for speed.
+    # 1. Chuyển dữ liệu sang Tensor
     if isinstance(states, torch.Tensor):
-        states = states
+        states = states.to(device)
     else:
-        states = torch.from_numpy(np.asarray(states, dtype=np.float32))
-    states = states.to(device)
-
+        states = torch.as_tensor(np.asarray(states, dtype=np.float32), device=device)
+    
     actions = torch.as_tensor(actions, dtype=torch.long, device=device)
-
+    
     if isinstance(old_log_probs, torch.Tensor):
-        old_log_probs = old_log_probs.detach()
+        old_log_probs = old_log_probs.detach().to(device)
     else:
-        old_log_probs = torch.stack(old_log_probs).detach()
-    old_log_probs = old_log_probs.squeeze(-1).to(device)
-
+        old_log_probs = torch.stack(old_log_probs).detach().squeeze(-1).to(device)
+    
     returns = torch.as_tensor(returns, dtype=torch.float32, device=device)
-    if normalize_returns:
-        if returns_mean is None:
-            returns_mean = returns.mean().item()
-        if returns_std is None:
-            returns_std = returns.std().item() + 1e-8
-        returns = (returns - returns_mean) / returns_std
-
     advantages = torch.as_tensor(advantages, dtype=torch.float32, device=device)
-    
-    # Normalize advantages
+
+    # 2. Normalize Advantage (BẮT BUỘC cho Policy Loss ổn định)
     advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-    
+    advantages = advantages.detach()
+
+    # 3. Training Loop
     total_policy_loss = 0.0
     total_value_loss = 0.0
-    total_loss_val = 0.0
     total_entropy = 0.0
     total_approx_kl = 0.0
     total_clip_frac = 0.0
     
     for _ in range(ppo_epochs):
+        # Forward pass lấy policy và value mới
         logits, values = model(states)
         values = values.squeeze()
-        # NOTE: Do NOT normalize values here - critic learns to predict
-        # normalized returns directly. Previous normalization was incorrect.
         
-        # Policy loss
         dist = torch.distributions.Categorical(logits=logits)
         new_log_probs = dist.log_prob(actions)
-        
+        entropy = dist.entropy().mean()
+
+        # --- POLICY LOSS ---
         ratio = torch.exp(new_log_probs - old_log_probs)
         surr1 = ratio * advantages
-        surr2 = torch.clamp(ratio, 1 - clip_epsilon, 1 + clip_epsilon) * advantages
+        surr2 = torch.clamp(ratio, 1.0 - clip_epsilon, 1.0 + clip_epsilon) * advantages
         policy_loss = -torch.min(surr1, surr2).mean()
-        
-        # Value loss (on normalized returns if enabled)
-        value_loss = 0.5 * (returns - values).pow(2).mean()
-        
-        # Entropy bonus
-        entropy = dist.entropy().mean()
+
+        # --- VALUE LOSS ---
+        value_loss = F.mse_loss(values, returns)
+
+        # --- TOTAL LOSS ---
+        loss = policy_loss + vf_coef * value_loss - entropy_coef * entropy
+
+        # Metrics
         approx_kl = (old_log_probs - new_log_probs).mean()
         clip_frac = ((ratio < (1 - clip_epsilon)) | (ratio > (1 + clip_epsilon))).float().mean()
-        
-        # Total loss (vf_coef scales value loss to be comparable with policy loss)
-        loss = policy_loss + vf_coef * value_loss - entropy_coef * entropy
-        
-        # Backprop
+
+        # Optimization step
         optimizer.zero_grad()
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
         optimizer.step()
         
+        # Logging
         total_policy_loss += policy_loss.item()
         total_value_loss += value_loss.item()
-        total_loss_val += loss.item()
         total_entropy += entropy.item()
         total_approx_kl += approx_kl.item()
         total_clip_frac += clip_frac.item()
-    
-    # Return average losses
+
     avg_policy_loss = total_policy_loss / ppo_epochs
     avg_value_loss = total_value_loss / ppo_epochs
-    avg_total_loss = total_loss_val / ppo_epochs
     avg_entropy = total_entropy / ppo_epochs
-    avg_approx_kl = total_approx_kl / ppo_epochs
-    avg_clip_frac = total_clip_frac / ppo_epochs
-
+    avg_total_loss = avg_policy_loss + vf_coef * avg_value_loss - entropy_coef * avg_entropy
+    
     metrics = {
         "entropy": avg_entropy,
-        "approx_kl": avg_approx_kl,
-        "clip_frac": avg_clip_frac,
+        "approx_kl": total_approx_kl / ppo_epochs,
+        "clip_frac": total_clip_frac / ppo_epochs,
     }
 
     return avg_policy_loss, avg_value_loss, avg_total_loss, metrics

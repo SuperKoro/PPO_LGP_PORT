@@ -101,7 +101,14 @@ class DynamicSchedulingEnv(gym.Env):
         self.action_library = action_library if action_library is not None else self._build_default_action_library()
         self.action_budget_s = float(action_budget_s)
         
-        self.observation_space = spaces.Box(low=-1000, high=10000, shape=(10,), dtype=np.float32)
+        # Number of machines for state representation
+        self.num_machines = len(self.machine_pool)
+        
+        # Observation space: 12 global features + 2 per-machine features
+        # Global: 6 original + 6 queue-based features
+        # Total = 12 + 2 * num_machines
+        obs_dim = 12 + 2 * self.num_machines
+        self.observation_space = spaces.Box(low=-10, high=10, shape=(obs_dim,), dtype=np.float32)
         self.action_space = spaces.Discrete(len(self.action_library))
 
     def _build_default_action_library(self):
@@ -228,19 +235,13 @@ class DynamicSchedulingEnv(gym.Env):
 
     def _get_state(self):
         """
-        Get current state observation.
+        Enhanced State Representation for JSSP.
         
-        Enhanced observation space (10D):
-        [0] current_time - Current simulation time
-        [1] num_unfinished_ops - Number of unfinished operations
-        [2] avg_processing_time - Average processing time of remaining ops
-        [3] min_slack - Minimum slack time (due_date - current_time - remaining_pt)
-        [4] max_slack - Maximum slack time
-        [5] urgent_ratio - Ratio of urgent jobs to total jobs
-        [6] total_remaining_pt - Total remaining processing time
-        [7] num_jobs - Number of unfinished jobs
-        [8] avg_due_date - Average due date of unfinished jobs
-        [9] machine_load_std - Standard deviation of machine load (utilization variance)
+        Features:
+        - 12 global features (6 original + 6 queue-based)
+        - 2 * num_machines per-machine features (finish_time, queue_load)
+        
+        Total: 12 + 2 * num_machines dimensions
         """
         finished_events, unfinished_jobs = split_schedule_list(
             self.current_schedule_events, 
@@ -248,78 +249,142 @@ class DynamicSchedulingEnv(gym.Env):
             self.all_jobs_info
         )
         
-        # Basic features
+        # Scale factors - adjusted for typical JSSP values
+        TIME_SCALE = 2000.0       # Max expected makespan
+        SLACK_SCALE = 1000.0      # Max slack time
+        PT_SCALE = 100.0          # Max processing time per operation
+        QUEUE_SCALE = 200.0       # Max queue load per machine
+        
+        # ============ GLOBAL FEATURES (Original 6) ============
+        
+        # 1. Time progress (0-1)
+        time_progress = self.current_time / TIME_SCALE
+        
+        # 2. Number of unfinished jobs (normalized)
         num_jobs = len(unfinished_jobs)
-        num_unfinished_ops = sum(len(info['operations']) for info in unfinished_jobs.values())
+        norm_num_jobs = num_jobs / 50.0
         
-        # Processing time features
-        total_pt = 0
-        count = 0
-        for info in unfinished_jobs.values():
-            for op in info['operations']:
-                total_pt += get_op_processing_time(op)
-                count += 1
-        avg_pt = total_pt / count if count > 0 else 0
-        
-        # Slack time features (due_date - current_time - remaining_pt)
+        # 3-4. Slack features (all jobs)
         slacks = []
         urgent_count = 0
-        due_dates = []
-        
         for job, info in unfinished_jobs.items():
             remaining_pt = sum(get_op_processing_time(op) for op in info['operations'])
             slack = info['due_date'] - self.current_time - remaining_pt
             slacks.append(slack)
-            due_dates.append(info['due_date'])
-            
-            # Check if urgent (from dynamic jobs)
             if info.get('job_type', 'Normal') == 'Urgent':
                 urgent_count += 1
         
-        min_slack = min(slacks) if slacks else 0
-        max_slack = max(slacks) if slacks else 0
-        avg_due_date = sum(due_dates) / len(due_dates) if due_dates else self.current_time
+        min_slack = min(slacks) / SLACK_SCALE if slacks else 0
+        avg_slack = (sum(slacks) / len(slacks) / SLACK_SCALE) if slacks else 0
+        
+        # 5. Urgent ratio (0-1)
         urgent_ratio = urgent_count / num_jobs if num_jobs > 0 else 0
         
-        # Machine load variance (how evenly distributed is the work)
-        machine_loads = {}
-        for event in self.current_schedule_events:
-            if event['finish'] > self.current_time:  # Only future events
-                m = event['machine']
-                duration = event['finish'] - max(event['start'], self.current_time)
-                machine_loads[m] = machine_loads.get(m, 0) + duration
+        # 6. Total remaining work (normalized)
+        total_remaining_pt = 0
+        for info in unfinished_jobs.values():
+            for op in info['operations']:
+                total_remaining_pt += get_op_processing_time(op)
+        norm_remaining_pt = total_remaining_pt / (PT_SCALE * 50)
         
-        if machine_loads:
-            loads = list(machine_loads.values())
-            mean_load = sum(loads) / len(loads)
-            machine_load_std = (sum((l - mean_load)**2 for l in loads) / len(loads)) ** 0.5
+        # ============ QUEUE-BASED FEATURES (New 6) ============
+        # Features about operations that are READY to be scheduled now
+        
+        ready_ops_pt = []       # Processing time of ready operations
+        ready_ops_slack = []    # Slack of jobs with ready operations
+        num_ready_urgent = 0
+        
+        for job_id, info in unfinished_jobs.items():
+            # Check if job is ready (arrived and has operations)
+            job_ready_time = info.get('job_ready', 0)
+            if job_ready_time <= self.current_time and info['operations']:
+                # Get next operation to be scheduled
+                next_op = info['operations'][0]
+                pt = get_op_processing_time(next_op)
+                ready_ops_pt.append(pt)
+                
+                # Calculate slack for this job
+                remaining_pt_job = sum(get_op_processing_time(op) for op in info['operations'])
+                slack = info['due_date'] - self.current_time - remaining_pt_job
+                ready_ops_slack.append(slack)
+                
+                if info.get('job_type', 'Normal') == 'Urgent':
+                    num_ready_urgent += 1
+        
+        # Queue statistics
+        if ready_ops_pt:
+            min_pt_waiting = min(ready_ops_pt) / PT_SCALE
+            max_pt_waiting = max(ready_ops_pt) / PT_SCALE
+            std_pt_waiting = float(np.std(ready_ops_pt)) / PT_SCALE if len(ready_ops_pt) > 1 else 0.0
         else:
-            machine_load_std = 0
+            min_pt_waiting = max_pt_waiting = std_pt_waiting = 0.0
         
-        # =====================================================
-        # NORMALIZATION: Scale all features to similar ranges
-        # This helps neural network training significantly
-        # =====================================================
-        # Scale factors (approximate max values for normalization)
-        TIME_SCALE = 200.0        # Max expected time
-        OPS_SCALE = 50.0          # Max expected operations
-        PT_SCALE = 50.0           # Max processing time
-        SLACK_SCALE = 500.0       # Max slack time (can be negative)
-        JOBS_SCALE = 30.0         # Max jobs
-        LOAD_SCALE = 100.0        # Max load std
+        if ready_ops_slack:
+            min_slack_waiting = min(ready_ops_slack) / SLACK_SCALE
+            avg_slack_waiting = float(np.mean(ready_ops_slack)) / SLACK_SCALE
+        else:
+            min_slack_waiting = avg_slack_waiting = 0.0
         
-        return np.array([
-            self.current_time / TIME_SCALE,              # [0] Normalized time (0-1+)
-            num_unfinished_ops / OPS_SCALE,              # [1] Normalized ops (0-1)
-            avg_pt / PT_SCALE,                           # [2] Normalized avg PT (0-1)
-            min_slack / SLACK_SCALE,                     # [3] Normalized min slack (-1 to 1)
-            max_slack / SLACK_SCALE,                     # [4] Normalized max slack (-1 to 1)
-            urgent_ratio,                                # [5] Already 0-1
-            total_pt / (PT_SCALE * OPS_SCALE),          # [6] Normalized total PT (0-1)
-            num_jobs / JOBS_SCALE,                       # [7] Normalized num jobs (0-1)
-            avg_due_date / (TIME_SCALE * 10),           # [8] Normalized due date (0-1)
-            machine_load_std / LOAD_SCALE                # [9] Normalized load std (0-1)
-        ], dtype=np.float32)
+        ratio_urgent_waiting = num_ready_urgent / len(ready_ops_pt) if ready_ops_pt else 0.0
+        
+        # ============ PER-MACHINE FEATURES ============
+        
+        # Initialize per-machine arrays
+        machine_finish_times = np.zeros(self.num_machines)
+        machine_queue_loads = np.zeros(self.num_machines)
+        
+        # Create machine_id to index mapping
+        machine_to_idx = {m: i for i, m in enumerate(sorted(self.machine_pool))}
+        
+        # Calculate when each machine will finish current work
+        for event in self.current_schedule_events:
+            if event['finish'] > self.current_time:
+                m = event['machine']
+                if m in machine_to_idx:
+                    m_idx = machine_to_idx[m]
+                    machine_finish_times[m_idx] = max(
+                        machine_finish_times[m_idx], 
+                        event['finish']
+                    )
+                    # Add remaining work on this machine
+                    remaining_work = event['finish'] - max(event['start'], self.current_time)
+                    machine_queue_loads[m_idx] += remaining_work
+        
+        # Normalize machine features
+        rel_finish_times = (machine_finish_times - self.current_time) / TIME_SCALE
+        rel_finish_times = np.clip(rel_finish_times, 0, 1)
+        
+        norm_queue_loads = machine_queue_loads / QUEUE_SCALE
+        norm_queue_loads = np.clip(norm_queue_loads, 0, 1)
+        
+        # ============ ASSEMBLE STATE VECTOR ============
+        state_features = [
+            # Original 6 global features
+            time_progress,           # [0] Time progress
+            norm_num_jobs,           # [1] Number of jobs
+            min_slack,               # [2] Min slack (all jobs)
+            avg_slack,               # [3] Avg slack (all jobs)
+            urgent_ratio,            # [4] Overall urgent ratio
+            norm_remaining_pt,       # [5] Total remaining work
+            # New 6 queue-based features
+            min_pt_waiting,          # [6] Min PT of ready ops (helps decide SPT)
+            max_pt_waiting,          # [7] Max PT of ready ops
+            std_pt_waiting,          # [8] Std of PT (high = SPT effective)
+            min_slack_waiting,       # [9] Min slack of ready jobs (helps decide EDD)
+            avg_slack_waiting,       # [10] Avg slack of ready jobs
+            ratio_urgent_waiting,    # [11] Ratio of urgent ready jobs
+        ]
+        
+        # Add per-machine features
+        state_features.extend(rel_finish_times.tolist())   # [12 : 12+M]
+        state_features.extend(norm_queue_loads.tolist())   # [12+M : 12+2M]
+        
+        state = np.array(state_features, dtype=np.float32)
+        
+        # Replace NaN/Inf with 0 for stability
+        state = np.nan_to_num(state, nan=0.0, posinf=1.0, neginf=-1.0)
+        
+        return state
 
     def get_metrics(self):
         """Calculate current scheduling metrics."""
@@ -436,10 +501,19 @@ class DynamicSchedulingEnv(gym.Env):
         # Combined cost: weighted sum of makespan and tardiness
         cost = alpha * makespan + (1 - alpha) * (total_tardiness_normal + beta * total_tardiness_urgent)
 
-        # Use delta-cost reward for better scaling and stability
+        # Use delta-cost reward with step penalty
         if getattr(self, "_last_cost", None) is None:
             self._last_cost = cost
-        reward = -(cost - self._last_cost)
+        
+        # Improvement reward: positive if cost decreased
+        improvement = self._last_cost - cost
+        
+        # Step penalty: encourage agent to finish faster
+        step_penalty = 0.1
+        
+        # Total reward = improvement - penalty
+        reward = improvement - step_penalty
+        
         self._last_cost = cost
 
         self.current_dynamic_index += 1
